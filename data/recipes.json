@@ -48,5 +48,35 @@
     "name": "Salad Bowl",
     "ingredients": ["lettuce", "tomato", "olive oil"],
     "instructions": "Chop veggies, toss with olive oil."
+  },
+  {
+    "name": "Pasta Carbonara",
+    "ingredients": ["pasta", "eggs", "cheese", "butter"],
+    "instructions": "Cook pasta according to package directions. While hot, mix with beaten eggs, grated cheese, and butter. The heat from the pasta will cook the eggs into a creamy sauce."
+  },
+  {
+    "name": "Caesar Salad",
+    "ingredients": ["lettuce", "cheese", "bread"],
+    "instructions": "Chop romaine lettuce and place in a bowl. Cut bread into cubes and toast for croutons. Toss lettuce with croutons, grated cheese, and Caesar dressing."
+  },
+  {
+    "name": "Banana Smoothie",
+    "ingredients": ["banana", "milk", "strawberry"],
+    "instructions": "Peel banana and add to blender with milk and strawberries. Blend until smooth and creamy. Add ice if desired."
+  },
+  {
+    "name": "Butter Naan",
+    "ingredients": ["naan", "butter"],
+    "instructions": "Warm naan bread in a pan or oven. Brush generously with melted butter while still hot. Serve immediately."
+  },
+  {
+    "name": "Egg Salad",
+    "ingredients": ["eggs", "lettuce", "bread"],
+    "instructions": "Boil eggs, peel, and chop. Mix with mayo and seasoning. Serve on lettuce leaves or bread."
+  },
+  {
+    "name": "Rice Bowl",
+    "ingredients": ["rice", "avocado", "soy sauce"],
+    "instructions": "Cook rice and place in a bowl. Top with sliced avocado and drizzle with soy sauce. Add sesame seeds if desired."
   }
 ]
