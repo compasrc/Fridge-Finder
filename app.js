@@ -1,3 +1,4 @@
+// Helper Functions
 async function loadRecipes() {
   const res = await fetch("data/recipes.json");
   return res.json();
@@ -33,7 +34,7 @@ function getSelectedAllergens() {
               .map(box => box.value.toLowerCase());
 }
 
-// Emoji mapping for ingredients
+// Emojis for ingredients
 function getIngredientEmoji(ingredient) {
   const mapping = {
     "bread": "🥖", "pasta": "🍝", "cheese": "🧀", "milk": "🥛",
@@ -46,9 +47,8 @@ function getIngredientEmoji(ingredient) {
   return "";
 }
 
-// -----------------
+
 // Recipe Filtering
-// -----------------
 function findRecipes(userIngredients, recipes, selectedAllergens) {
   if (userIngredients.length === 0) return [];
 
@@ -69,9 +69,7 @@ function findRecipes(userIngredients, recipes, selectedAllergens) {
   });
 }
 
-// -----------------
 // Render Recipes
-// -----------------
 let currentResults = [];
 let allRecipes = [];
 
@@ -105,9 +103,8 @@ function renderRecipes(recipes) {
   });
 }
 
-// -----------------
+
 // Favorites
-// -----------------
 function toggleFavorite(recipe) {
   const key = recipe.name;
   if (localStorage.getItem(key)) {
@@ -130,4 +127,41 @@ function renderFavorites() {
   }
 
   favoriteRecipes.forEach(recipe => {
-    const card =
+    const card = document.createElement("div");
+    card.className = "recipe-card";
+    const emojis = recipe.ingredients.map(getIngredientEmoji).filter(Boolean).join(" ");
+    card.innerHTML = `
+      <h3>${emojis} ${recipe.name}</h3>
+      <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
+      <p>${recipe.instructions}</p>
+    `;
+    favoritesDiv.appendChild(card);
+  });
+}
+
+
+// Initialize & Search
+async function initializeApp() {
+  allRecipes = await loadRecipes();
+  const allIngredients = getAllIngredients(allRecipes);
+  createIngredientBoxes(allIngredients);
+  renderFavorites();
+}
+
+async function performSearch() {
+  const userIngredients = getSelectedIngredients();
+  const selectedAllergens = getSelectedAllergens();
+
+  if (userIngredients.length === 0) {
+    alert("Please select at least one ingredient!");
+    return;
+  }
+
+  currentResults = findRecipes(userIngredients, allRecipes, selectedAllergens);
+  renderRecipes(currentResults);
+}
+
+
+// Event Listeners
+document.getElementById("search-btn").addEventListener("click", performSearch);
+window.addEventListener("load", initializeApp);
