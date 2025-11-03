@@ -1,4 +1,6 @@
+// -----------------
 // Helper Functions
+// -----------------
 async function loadRecipes() {
   const res = await fetch("data/recipes.json");
   return res.json();
@@ -34,7 +36,7 @@ function getSelectedAllergens() {
               .map(box => box.value.toLowerCase());
 }
 
-// Emojis for ingredients
+// Emoji mapping for ingredients
 function getIngredientEmoji(ingredient) {
   const mapping = {
     "bread": "🥖", "pasta": "🍝", "cheese": "🧀", "milk": "🥛",
@@ -47,8 +49,9 @@ function getIngredientEmoji(ingredient) {
   return "";
 }
 
-
+// -----------------
 // Recipe Filtering
+// -----------------
 function findRecipes(userIngredients, recipes, selectedAllergens) {
   if (userIngredients.length === 0) return [];
 
@@ -69,7 +72,9 @@ function findRecipes(userIngredients, recipes, selectedAllergens) {
   });
 }
 
+// -----------------
 // Render Recipes
+// -----------------
 let currentResults = [];
 let allRecipes = [];
 
@@ -103,8 +108,9 @@ function renderRecipes(recipes) {
   });
 }
 
-
+// -----------------
 // Favorites
+// -----------------
 function toggleFavorite(recipe) {
   const key = recipe.name;
   if (localStorage.getItem(key)) {
@@ -139,8 +145,9 @@ function renderFavorites() {
   });
 }
 
-
+// -----------------
 // Initialize & Search
+// -----------------
 async function initializeApp() {
   allRecipes = await loadRecipes();
   const allIngredients = getAllIngredients(allRecipes);
@@ -148,20 +155,4 @@ async function initializeApp() {
   renderFavorites();
 }
 
-async function performSearch() {
-  const userIngredients = getSelectedIngredients();
-  const selectedAllergens = getSelectedAllergens();
-
-  if (userIngredients.length === 0) {
-    alert("Please select at least one ingredient!");
-    return;
-  }
-
-  currentResults = findRecipes(userIngredients, allRecipes, selectedAllergens);
-  renderRecipes(currentResults);
-}
-
-
-// Event Listeners
-document.getElementById("search-btn").addEventListener("click", performSearch);
-window.addEventListener("load", initializeApp);
+async function
