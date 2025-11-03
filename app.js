@@ -6,6 +6,15 @@ async function loadRecipes() {
   return res.json();
 }
 
+async function initializeApp() {
+  allRecipes = await loadRecipes();
+  console.log("Loaded recipes:", allRecipes); // ADD THIS LINE
+  const allIngredients = getAllIngredients(allRecipes);
+  console.log("All ingredients:", allIngredients); // ADD THIS LINE
+  createIngredientBoxes(allIngredients);
+  renderFavorites();
+}
+
 function getAllIngredients(recipes) {
   const ingredients = new Set();
   recipes.forEach(recipe => {
@@ -194,3 +203,4 @@ async function performSearch() {
 // -----------------
 document.getElementById("search-btn").addEventListener("click", performSearch);
 window.addEventListener("load", initializeApp);
+
