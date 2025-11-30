@@ -268,3 +268,40 @@ h2 {
   border-radius: 10px;
   border: 2px dashed #FFD89B;
 }
+
+/* -----------------
+   Comment Section
+----------------- */
+.comment-section {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.comment-input {
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid #FFD89B;
+  width: 100%;
+  outline: none;
+}
+
+.comment-btn {
+  padding: 6px 12px;
+  margin-top: 5px;
+  background: linear-gradient(135deg,#FFA347 0%,#FF8C42 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
+.comment-btn:hover {
+  transform: scale(1.05);
+}
+
+.comment-list {
+  margin-top: 8px;
+  background: #FFF8EB;
