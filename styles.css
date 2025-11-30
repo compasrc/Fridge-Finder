@@ -35,6 +35,75 @@ h2 {
   font-size: 1.5em;
 }
 
+/* -----------------
+   Account / Login / Signup
+----------------- */
+.login-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #FFF5E6;
+  border-radius: 15px;
+  border: 2px solid #FFD89B;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.login-section input[type="text"],
+.login-section input[type="password"] {
+  padding: 10px 15px;
+  font-size: 1.1em;
+  border: 2px solid #FFD89B;
+  border-radius: 10px;
+  outline: none;
+  width: 250px;
+  transition: all 0.2s;
+}
+
+.login-section input:focus {
+  border-color: #FF8C42;
+  box-shadow: 0 0 8px rgba(255, 140, 66, 0.3);
+}
+
+.login-section button {
+  padding: 10px 20px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(135deg, #FFA347 0%, #FF8C42 100%);
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+  transition: all 0.2s;
+}
+
+.login-section button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 140, 66, 0.4);
+}
+
+.login-section button:active {
+  transform: scale(0.98);
+}
+
+.link {
+  color: #FF8C42;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+#signOutDiv p {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: #6B4423;
+}
+
+/* -----------------
+   Allergy Filters
+----------------- */
 .allergy-section {
   margin-bottom: 20px;
   padding: 15px;
@@ -65,6 +134,9 @@ h2 {
   accent-color: #FF8C42;
 }
 
+/* -----------------
+   Ingredient Boxes
+----------------- */
 #ingredients-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -99,6 +171,9 @@ h2 {
   box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
 }
 
+/* -----------------
+   Search Button
+----------------- */
 #search-btn {
   width: 100%;
   padding: 15px;
@@ -123,6 +198,9 @@ h2 {
   transform: scale(0.98);
 }
 
+/* -----------------
+   Recipe Cards
+----------------- */
 .recipe-card {
   background: white;
   border: 2px solid #FFE4C4;
@@ -174,10 +252,9 @@ h2 {
   box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
 }
 
-#results, #favorites {
-  min-height: 50px;
-}
-
+/* -----------------
+   Sections & No Results
+----------------- */
 .section {
   margin-bottom: 40px;
 }
@@ -190,71 +267,4 @@ h2 {
   background: #FFF8EB;
   border-radius: 10px;
   border: 2px dashed #FFD89B;
-}
-
-/* -----------------
-   Sign In / Sign Out
------------------ */
-.login-section {
-  margin-bottom: 30px;
-  padding: 20px;
-  background: #FFF5E6;
-  border-radius: 15px;
-  border: 2px solid #FFD89B;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-}
-
-#signInForm input[type="text"] {
-  padding: 10px 15px;
-  font-size: 1.1em;
-  border: 2px solid #FFD89B;
-  border-radius: 10px;
-  outline: none;
-  width: 250px;
-  transition: all 0.2s;
-}
-
-#signInForm input[type="text"]:focus {
-  border-color: #FF8C42;
-  box-shadow: 0 0 8px rgba(255, 140, 66, 0.3);
-}
-
-#signInForm button, #signOutBtn {
-  padding: 10px 20px;
-  font-size: 1.1em;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  color: white;
-  background: linear-gradient(135deg, #FFA347 0%, #FF8C42 100%);
-  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
-  transition: all 0.2s;
-}
-
-/* Add emojis to buttons */
-#signInForm button::before {
-  content: "👤 ";
-}
-
-#signOutBtn::before {
-  content: "🔓 ";
-}
-
-#signInForm button:hover, #signOutBtn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(255, 140, 66, 0.4);
-}
-
-#signInForm button:active, #signOutBtn:active {
-  transform: scale(0.98);
-}
-
-#signOutDiv p {
-  font-size: 1.2em;
-  font-weight: 500;
-  color: #6B4423;
 }
