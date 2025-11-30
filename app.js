@@ -24,9 +24,10 @@ async function loadRecipes() {
     const res = await fetch('data/recipes.json');
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     allRecipes = await res.json();
+    console.log('Recipes loaded successfully:', allRecipes.length, 'recipes');
   } catch (err) {
     console.error('Failed to load recipes.json:', err);
-    alert('Error loading recipes.json. Make sure the file exists in data/recipes.json');
+    alert('Error loading recipes.json. Make sure the file exists in data/recipes.json\n\nError: ' + err.message);
   }
 }
 
@@ -185,7 +186,19 @@ function getAllIngredients() {
 function createIngredientBoxes() {
   const container = document.getElementById('ingredients-container');
   container.innerHTML = '';
+  
+  if (allRecipes.length === 0) {
+    container.innerHTML = '<div class="no-results">Loading recipes...</div>';
+    return;
+  }
+  
   const ingredients = getAllIngredients();
+  
+  if (ingredients.length === 0) {
+    container.innerHTML = '<div class="no-results">No ingredients found. Check recipes.json file.</div>';
+    return;
+  }
+  
   ingredients.forEach(ing => {
     const box = document.createElement('div');
     box.className = 'ingredient-box';
@@ -646,7 +659,17 @@ document.getElementById('search-btn').addEventListener('click', () => {
 // Initialize
 // -----------------
 window.addEventListener('load', async () => {
+  console.log('Starting app initialization...');
+  
   await loadRecipes();
+  
+  if (allRecipes.length === 0) {
+    console.error('No recipes loaded!');
+    alert('Failed to load recipes. Please check:\n1. data/recipes.json exists\n2. Your Python server is running\n3. Check browser console for errors');
+  } else {
+    console.log('Successfully loaded', allRecipes.length, 'recipes');
+  }
+  
   createIngredientBoxes();
   
   // Check if user was previously logged in
@@ -654,6 +677,7 @@ window.addEventListener('load', async () => {
   if (savedUser) {
     const users = getUsers();
     if (users[savedUser]) {
+      console.log('Auto-logging in user:', savedUser);
       showMainContent(savedUser);
     } else {
       showAuth();
