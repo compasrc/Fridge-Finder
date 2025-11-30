@@ -9,7 +9,19 @@
 <body>
   <div class="container">
     <h1>🍳 Recipe Finder</h1>
-    
+
+    <!-- Sign In / Sign Out -->
+    <div class="login-section">
+      <form id="signInForm">
+        <input type="text" id="username" placeholder="Enter username" required>
+        <button type="button" id="signInBtn">Sign In</button>
+      </form>
+      <div id="signOutDiv" style="display:none;">
+        <p>Signed in as <span id="displayUser"></span></p>
+        <button type="button" id="signOutBtn">Sign Out</button>
+      </div>
+    </div>
+
     <div class="section allergy-section">
       <h2>Dietary Restrictions</h2>
       <div class="allergy-filters">
