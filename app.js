@@ -1,105 +1,111 @@
 // -----------------
-// User Authentication
+// Sign In / Sign Out with Password
 // -----------------
-const signupBtn = document.getElementById('signupBtn');
-const signinBtn = document.getElementById('signinBtn');
-const signOutBtn = document.getElementById('signOutBtn');
-const displayUser = document.getElementById('displayUser');
 const signInForm = document.getElementById('signInForm');
-const signUpForm = document.getElementById('signUpForm');
 const signOutDiv = document.getElementById('signOutDiv');
+const displayUser = document.getElementById('displayUser');
+const signInBtn = document.getElementById('signInBtn');
+const signOutBtn = document.getElementById('signOutBtn');
 
-// Check logged in user
-let currentUser = localStorage.getItem('loggedInUser');
-if (currentUser) showSignedIn(currentUser);
+const usersKey = 'users'; // store users in localStorage
 
-// --- Sign Up ---
-signupBtn.addEventListener('click', () => {
-  const username = document.getElementById('signupUsername').value.trim();
-  const password = document.getElementById('signupPassword').value.trim();
+function getUsers() {
+  return JSON.parse(localStorage.getItem(usersKey) || '{}');
+}
 
-  if (!username || !password) return alert("Enter username and password!");
+function saveUsers(users) {
+  localStorage.setItem(usersKey, JSON.stringify(users));
+}
 
-  const users = JSON.parse(localStorage.getItem('users') || '{}');
-  if (users[username]) return alert("Username already exists!");
+// Check if user is signed in
+let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+if (currentUser) {
+  showSignedIn(currentUser.username);
+}
 
-  users[username] = { password };
-  localStorage.setItem('users', JSON.stringify(users));
+// Sign in / create account logic
+signInBtn.addEventListener('click', () => {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  if (!username || !password) {
+    alert('Please enter both username and password');
+    return;
+  }
 
-  alert("Account created! Please sign in.");
-  document.getElementById('signupUsername').value = '';
-  document.getElementById('signupPassword').value = '';
+  const users = getUsers();
+  if (users[username]) {
+    if (users[username].password === password) {
+      currentUser = { username };
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      showSignedIn(username);
+      renderFavorites();
+    } else {
+      alert('Incorrect password');
+    }
+  } else {
+    // create account
+    users[username] = { password };
+    saveUsers(users);
+    currentUser = { username };
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    showSignedIn(username);
+    renderFavorites();
+  }
 });
 
-// --- Sign In ---
-signinBtn.addEventListener('click', () => {
-  const username = document.getElementById('signinUsername').value.trim();
-  const password = document.getElementById('signinPassword').value.trim();
-  const users = JSON.parse(localStorage.getItem('users') || '{}');
-
-  if (!username || !password) return alert("Enter username and password!");
-  if (!users[username] || users[username].password !== password) return alert("Invalid username/password");
-
-  localStorage.setItem('loggedInUser', username);
-  currentUser = username;
-  showSignedIn(username);
-  renderFavorites();
-  renderComments();
-});
-
-// --- Sign Out ---
+// Sign out
 signOutBtn.addEventListener('click', () => {
-  localStorage.removeItem('loggedInUser');
+  localStorage.removeItem('currentUser');
   currentUser = null;
   showSignedOut();
   renderFavorites();
-  renderComments();
 });
 
 function showSignedIn(username) {
   signInForm.style.display = 'none';
-  signUpForm.style.display = 'none';
   signOutDiv.style.display = 'block';
   displayUser.textContent = username;
 }
 
 function showSignedOut() {
-  signInForm.style.display = 'block';
-  signUpForm.style.display = 'block';
+  signInForm.style.display = 'flex';
   signOutDiv.style.display = 'none';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
 }
 
 // -----------------
-// Recipe & Ingredients
+// Helper Functions
 // -----------------
-let allRecipes = [];
-let currentResults = [];
-
 async function loadRecipes() {
   try {
     const res = await fetch("data/recipes.json");
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
-  } catch (err) {
-    console.error(err);
-    alert("Could not load recipes.");
+  } catch (error) {
+    console.error("Error loading recipes:", error);
+    alert("Failed to load recipes. Please check that data/recipes.json exists.");
     return [];
   }
 }
 
 function getAllIngredients(recipes) {
   const ingredients = new Set();
-  recipes.forEach(r => r.ingredients.forEach(i => ingredients.add(i.toLowerCase())));
+  recipes.forEach(recipe => recipe.ingredients.forEach(i => ingredients.add(i.toLowerCase())));
   return Array.from(ingredients).sort();
 }
 
 function createIngredientBoxes(ingredients) {
   const container = document.getElementById("ingredients-container");
   container.innerHTML = "";
-  ingredients.forEach(ing => {
+  if (!ingredients.length) {
+    container.innerHTML = '<p style="color:#B8732E;">No ingredients available</p>';
+    return;
+  }
+  ingredients.forEach(ingredient => {
     const box = document.createElement("div");
     box.className = "ingredient-box";
-    box.textContent = ing;
+    box.textContent = ingredient;
     box.addEventListener("click", () => box.classList.toggle("selected"));
     container.appendChild(box);
   });
@@ -113,179 +119,178 @@ function getSelectedAllergens() {
   return Array.from(document.querySelectorAll(".allergy-filter:checked")).map(b => b.value.toLowerCase());
 }
 
-// -----------------
-// Emoji Helper
-// -----------------
 function getIngredientEmoji(ingredient) {
   const mapping = {
-    "bread": "🥖","pasta": "🍝","cheese": "🧀","milk": "🥛",
-    "nuts": "🌰","eggs": "🥚","butter": "🧈","avocado": "🥑",
-    "tomato": "🍅","banana": "🍌","strawberry": "🍓",
-    "lettuce": "🥬","rice": "🍚","peanut butter": "🥜",
-    "jelly": "🍇","naan": "🍞","soy sauce": "🧂","olive oil": "🫒",
-    "salt": "🧂","tomato sauce": "🍅"
+    "bread":"🥖","pasta":"🍝","cheese":"🧀","milk":"🥛",
+    "nuts":"🌰","eggs":"🥚","butter":"🧈","avocado":"🥑",
+    "tomato":"🍅","banana":"🍌","strawberry":"🍓","lettuce":"🥬",
+    "rice":"🍚","peanut butter":"🥜","jelly":"🍇","naan":"🍞",
+    "soy sauce":"🧂","olive oil":"🫒","salt":"🧂","tomato sauce":"🍅"
   };
-  for (let k in mapping) if (ingredient.includes(k)) return mapping[k];
+  for(const key in mapping) if(ingredient.includes(key)) return mapping[key];
   return "";
 }
 
 // -----------------
 // Recipe Filtering
 // -----------------
-function findRecipes(userIngredients, recipes, allergens) {
-  if (!userIngredients.length) return [];
-  return recipes.filter(r => {
-    const rIngs = r.ingredients.map(i=>i.toLowerCase());
-    for (const allergen of allergens) {
-      if (rIngs.some(i=>{
-        if (allergen=="gluten") return i.includes("bread")||i.includes("pasta")||i.includes("naan");
-        if (allergen=="nuts") return i.includes("nuts")||i.includes("peanut")||i.includes("almond");
-        if (allergen=="dairy") return i.includes("cheese")||i.includes("milk")||i.includes("butter");
+function findRecipes(userIngredients, recipes, selectedAllergens) {
+  if(!userIngredients.length) return [];
+  return recipes.filter(recipe => {
+    const recipeIngredients = recipe.ingredients.map(i => i.toLowerCase());
+    for(const allergen of selectedAllergens) {
+      if(recipeIngredients.some(i=>{
+        if(allergen==="gluten") return i.includes("bread")||i.includes("pasta")||i.includes("naan");
+        if(allergen==="nuts") return i.includes("nuts")||i.includes("peanut")||i.includes("almond");
+        if(allergen==="dairy") return i.includes("cheese")||i.includes("milk")||i.includes("butter");
         return false;
       })) return false;
     }
-    return rIngs.some(i=>userIngredients.includes(i));
+    return recipeIngredients.some(i=>userIngredients.includes(i));
   });
 }
 
 // -----------------
-// Render Recipes
+// Render Recipes & Favorites
 // -----------------
+let currentResults = [];
+let allRecipes = [];
+
 function getUserKey(recipeName) {
-  return currentUser ? `${currentUser}_${recipeName}` : recipeName;
+  return currentUser ? `${currentUser.username}_${recipeName}` : recipeName;
+}
+
+function toggleFavorite(recipe) {
+  const key = getUserKey(recipe.name);
+  if(localStorage.getItem(key)) localStorage.removeItem(key);
+  else localStorage.setItem(key, JSON.stringify(recipe));
+  renderRecipes(currentResults);
+  renderFavorites();
 }
 
 function renderRecipes(recipes) {
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = "";
 
-  if (!recipes.length) {
-    resultsDiv.innerHTML = '<div class="no-results">No matches found!</div>';
+  if(!recipes.length){
+    resultsDiv.innerHTML = '<div class="no-results">No matches found.</div>';
     return;
   }
 
   recipes.forEach(recipe => {
     const card = document.createElement("div");
     card.className = "recipe-card";
+    card.dataset.name = recipe.name;
+
     const emojis = recipe.ingredients.map(getIngredientEmoji).filter(Boolean).join(" ");
 
-    // Favorite Button
-    const favBtn = document.createElement("button");
-    favBtn.className = "fav-btn";
-    favBtn.textContent = localStorage.getItem(getUserKey(recipe.name)) ? "★ Favorited" : "☆ Favorite";
-    favBtn.addEventListener("click", ()=>{
-      const key = getUserKey(recipe.name);
-      if (localStorage.getItem(key)) localStorage.removeItem(key);
-      else localStorage.setItem(key, JSON.stringify(recipe));
-      renderRecipes(currentResults);
-      renderFavorites();
-    });
+    const favButton = document.createElement("button");
+    favButton.textContent = localStorage.getItem(getUserKey(recipe.name))?"★ Favorited":"☆ Favorite";
+    favButton.className = "fav-btn";
+    favButton.addEventListener("click",()=>toggleFavorite(recipe));
 
     // Comment Section
     const commentDiv = document.createElement("div");
     commentDiv.className = "comment-section";
-
-    // Comment Input
-    const commentInput = document.createElement("input");
-    commentInput.type = "text";
-    commentInput.placeholder = "Add a comment...";
-    commentInput.className = "comment-input";
-
-    const commentBtn = document.createElement("button");
-    commentBtn.textContent = "Post";
-    commentBtn.className = "comment-btn";
-
-    commentBtn.addEventListener("click", ()=>{
-      if (!currentUser) return alert("Sign in to comment!");
-      const text = commentInput.value.trim();
-      if (!text) return;
-      const key = `comments_${recipe.name}`;
-      const comments = JSON.parse(localStorage.getItem(key) || "[]");
-      comments.push({username: currentUser, text, timestamp: Date.now()});
-      localStorage.setItem(key, JSON.stringify(comments));
-      commentInput.value = "";
+    commentDiv.innerHTML = `
+      <input type="text" placeholder="Write a comment..." class="comment-input">
+      <button type="button" class="comment-btn">Post</button>
+    `;
+    commentDiv.querySelector(".comment-btn").addEventListener("click", ()=>{
+      postComment(recipe.name, commentDiv.querySelector(".comment-input").value);
+      commentDiv.querySelector(".comment-input").value="";
       renderComments();
     });
 
-    commentDiv.appendChild(commentInput);
-    commentDiv.appendChild(commentBtn);
-
-    card.innerHTML += `
+    card.innerHTML = `
       <h3>${emojis} ${recipe.name}</h3>
       <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
       <p>${recipe.instructions}</p>
     `;
-    card.appendChild(favBtn);
+    card.appendChild(favButton);
     card.appendChild(commentDiv);
-
     resultsDiv.appendChild(card);
   });
 
   renderComments();
 }
 
-// -----------------
-// Render Favorites
-// -----------------
-function renderFavorites() {
-  const favDiv = document.getElementById("favorites");
-  favDiv.innerHTML = "";
-  if (!currentUser) {
-    favDiv.innerHTML = '<div class="no-results">Sign in to see favorites!</div>';
+function renderFavorites(){
+  const favoritesDiv = document.getElementById("favorites");
+  favoritesDiv.innerHTML = "";
+
+  if(!currentUser){
+    favoritesDiv.innerHTML = '<div class="no-results">Sign in to save favorites!</div>';
     return;
   }
 
-  const favRecipes = Object.keys(localStorage)
-    .filter(k=>k.startsWith(`${currentUser}_`))
+  const favoriteRecipes = Object.keys(localStorage)
+    .filter(k=>k.startsWith(`${currentUser.username}_`))
     .map(k=>JSON.parse(localStorage.getItem(k)));
 
-  if (!favRecipes.length) {
-    favDiv.innerHTML = '<div class="no-results">No favorites yet!</div>';
+  if(!favoriteRecipes.length){
+    favoritesDiv.innerHTML = '<div class="no-results">No favorite recipes yet.</div>';
     return;
   }
 
-  favRecipes.forEach(r=>{
+  favoriteRecipes.forEach(recipe=>{
     const card = document.createElement("div");
     card.className = "recipe-card";
-    const emojis = r.ingredients.map(getIngredientEmoji).filter(Boolean).join(" ");
+    card.dataset.name = recipe.name;
 
-    const removeBtn = document.createElement("button");
-    removeBtn.textContent = "★ Remove";
-    removeBtn.className = "fav-btn";
-    removeBtn.addEventListener("click", ()=>{
-      localStorage.removeItem(getUserKey(r.name));
+    const emojis = recipe.ingredients.map(getIngredientEmoji).filter(Boolean).join(" ");
+
+    const unfavBtn = document.createElement("button");
+    unfavBtn.textContent="★ Remove";
+    unfavBtn.className="fav-btn";
+    unfavBtn.addEventListener("click",()=>{
+      localStorage.removeItem(getUserKey(recipe.name));
       renderFavorites();
-      if (currentResults.length) renderRecipes(currentResults);
+      if(currentResults.length>0) renderRecipes(currentResults);
     });
 
-    card.innerHTML = `<h3>${emojis} ${r.name}</h3>
-      <p><strong>Ingredients:</strong> ${r.ingredients.join(", ")}</p>
-      <p>${r.instructions}</p>`;
-
-    card.appendChild(removeBtn);
-    favDiv.appendChild(card);
+    card.innerHTML = `
+      <h3>${emojis} ${recipe.name}</h3>
+      <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
+      <p>${recipe.instructions}</p>
+    `;
+    card.appendChild(unfavBtn);
+    favoritesDiv.appendChild(card);
   });
 }
 
 // -----------------
-// Render Comments
+// Comments
 // -----------------
-function renderComments() {
-  document.querySelectorAll(".recipe-card").forEach(card => {
-    const recipeName = card.querySelector("h3").textContent.replace(/^[^ ]+ /,"");
+function postComment(recipeName, text){
+  if(!currentUser){
+    alert("Sign in to post comments!");
+    return;
+  }
+  if(!text.trim()) return;
+
+  const key = `comments_${recipeName}`;
+  const comments = JSON.parse(localStorage.getItem(key) || "[]");
+  comments.push({username: currentUser.username, text: text.trim(), timestamp: Date.now()});
+  localStorage.setItem(key, JSON.stringify(comments));
+  renderComments();
+}
+
+function renderComments(){
+  document.querySelectorAll(".recipe-card").forEach(card=>{
+    const recipeName = card.dataset.name;
     const key = `comments_${recipeName}`;
     const comments = JSON.parse(localStorage.getItem(key) || "[]");
 
-    // Remove previous comment list
-    const prevList = card.querySelector(".comment-list");
-    if (prevList) prevList.remove();
+    let prevList = card.querySelector(".comment-list");
+    if(prevList) prevList.remove();
 
-    // Create new list
     const listDiv = document.createElement("div");
-    listDiv.className = "comment-list";
+    listDiv.className="comment-list";
+
     comments.forEach(c=>{
       const cDiv = document.createElement("div");
-      cDiv.className = "comment";
+      cDiv.className="comment";
       const time = new Date(c.timestamp).toLocaleString();
       cDiv.textContent = `${c.username}: ${c.text} (${time})`;
       listDiv.appendChild(cDiv);
@@ -296,21 +301,22 @@ function renderComments() {
 }
 
 // -----------------
-// Initialize App
+// Initialize & Search
 // -----------------
-async function initializeApp() {
+async function initializeApp(){
   allRecipes = await loadRecipes();
-  const ingredients = getAllIngredients(allRecipes);
-  createIngredientBoxes(ingredients);
+  createIngredientBoxes(getAllIngredients(allRecipes));
   renderFavorites();
 }
 
-document.getElementById("search-btn").addEventListener("click", () => {
-  const selected = getSelectedIngredients();
-  const allergens = getSelectedAllergens();
-  if (!selected.length) return alert("Select at least one ingredient!");
-  currentResults = findRecipes(selected, allRecipes, allergens);
+async function performSearch(){
+  const userIngredients = getSelectedIngredients();
+  const selectedAllergens = getSelectedAllergens();
+  if(!userIngredients.length){ alert("Select at least one ingredient!"); return; }
+  currentResults = findRecipes(userIngredients, allRecipes, selectedAllergens);
   renderRecipes(currentResults);
-});
+}
 
+// Event Listeners
+document.getElementById("search-btn").addEventListener("click", performSearch);
 window.addEventListener("load", initializeApp);
