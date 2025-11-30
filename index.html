@@ -10,53 +10,62 @@
   <div class="container">
     <h1>FridgeFinder</h1>
 
-    <!-- Sign In / Sign Up Section -->
-    <div id="signInDiv" class="login-section">
+    <!-- -----------------
+         Authentication Screen
+    ----------------- -->
+    <div id="authDiv" class="auth-section">
       <h2>Sign In or Create Account</h2>
       <input type="text" id="username" placeholder="Username">
       <input type="password" id="password" placeholder="Password">
-      <div style="display:flex; gap:10px;">
+      <div class="auth-buttons">
         <button id="signInBtn">Sign In</button>
         <button id="signUpBtn">Create Account</button>
       </div>
+      <p id="authMessage" class="auth-message"></p>
     </div>
 
-    <!-- Sign Out Section -->
-    <div id="signOutDiv" class="login-section" style="display:none;">
-      <p>Signed in as <span id="displayUser"></span></p>
-      <button id="signOutBtn">Sign Out</button>
-    </div>
+    <!-- -----------------
+         Main Site Content
+    ----------------- -->
+    <div id="mainContent" style="display:none;">
+      <div id="signOutDiv" class="signout-section">
+        <p>Signed in as <span id="displayUser"></span></p>
+        <button id="signOutBtn">Sign Out</button>
+      </div>
 
-    <!-- Allergy Filters -->
-    <div class="allergy-section">
+      <h2>Select Ingredients</h2>
+      <div id="ingredients-container"></div>
+
       <h2>Allergy Filters</h2>
       <div class="allergy-filters">
-        <label><input type="checkbox" class="allergy-filter" value="gluten">Gluten</label>
-        <label><input type="checkbox" class="allergy-filter" value="nuts">Nuts</label>
-        <label><input type="checkbox" class="allergy-filter" value="dairy">Dairy</label>
+        <label><input type="checkbox" class="allergy-filter" value="gluten"> Gluten</label>
+        <label><input type="checkbox" class="allergy-filter" value="nuts"> Nuts</label>
+        <label><input type="checkbox" class="allergy-filter" value="dairy"> Dairy</label>
+      </div>
+
+      <button id="search-btn">Find Recipes</button>
+
+      <div class="section">
+        <h2>Search Results</h2>
+        <div id="results"></div>
+      </div>
+
+      <div class="section">
+        <h2>Favorites</h2>
+        <div id="favorites"></div>
+      </div>
+
+      <div class="section">
+        <h2>Community Comments</h2>
+        <div id="commentSection">
+          <input type="text" id="commentInput" placeholder="Write a comment...">
+          <button id="postCommentBtn">Post Comment</button>
+          <div id="commentList"></div>
+        </div>
       </div>
     </div>
-
-    <!-- Ingredients -->
-    <h2>Select Ingredients</h2>
-    <div id="ingredients-container"></div>
-
-    <!-- Search Button -->
-    <button id="search-btn">Find Recipes</button>
-
-    <!-- Recipe Results -->
-    <div class="section">
-      <h2>Recipes</h2>
-      <div id="results"></div>
-    </div>
-
-    <!-- Favorites -->
-    <div class="section">
-      <h2>My Favorites</h2>
-      <div id="favorites"></div>
-    </div>
-
   </div>
+
   <script src="app.js"></script>
 </body>
 </html>
