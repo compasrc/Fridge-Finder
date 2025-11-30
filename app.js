@@ -19,7 +19,7 @@ signInBtn.addEventListener('click', () => {
   if (username) {
     localStorage.setItem('user', username);
     showSignedIn(username);
-    renderFavorites(); // update favorites for this user
+    renderFavorites();
   } else {
     alert('Please enter a username');
   }
@@ -29,7 +29,7 @@ signInBtn.addEventListener('click', () => {
 signOutBtn.addEventListener('click', () => {
   localStorage.removeItem('user');
   showSignedOut();
-  renderFavorites(); // clear favorites view
+  renderFavorites();
 });
 
 // Helper functions for sign in/out
@@ -121,7 +121,6 @@ function findRecipes(userIngredients, recipes, selectedAllergens) {
   return recipes.filter(recipe => {
     const recipeIngredients = recipe.ingredients.map(i => i.toLowerCase());
 
-    // exclude allergens
     for (const allergen of selectedAllergens) {
       if (recipeIngredients.some(i => {
         if (allergen === "gluten") return i.includes("bread") || i.includes("pasta") || i.includes("naan");
@@ -164,8 +163,16 @@ function renderRecipes(recipes) {
     card.innerHTML = `
       <h3>${emojis} ${recipe.name}</h3>
       <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
-      <p>${recipe.instructions}</p>
+      <p><strong>Instructions:</strong> ${recipe.instructions}</p>
+      <p><strong>Prep Time:</strong> ${recipe.prep_time_min} min | 
+         <strong>Cook Time:</strong> ${recipe.cook_time_min} min | 
+         <strong>Heat:</strong> ${recipe.heat}</p>
+      <p><strong>Nutrition:</strong> ${recipe.nutrition.calories} kcal, 
+         ${recipe.nutrition.protein_g}g protein, 
+         ${recipe.nutrition.fat_g}g fat, 
+         ${recipe.nutrition.carbs_g}g carbs</p>
     `;
+
     card.appendChild(favButton);
     resultsDiv.appendChild(card);
   });
@@ -213,7 +220,7 @@ function renderFavorites() {
     const card = document.createElement("div");
     card.className = "recipe-card";
     const emojis = recipe.ingredients.map(getIngredientEmoji).filter(Boolean).join(" ");
-    
+
     const unfavButton = document.createElement("button");
     unfavButton.textContent = "★ Remove";
     unfavButton.className = "fav-btn";
@@ -222,12 +229,20 @@ function renderFavorites() {
       renderFavorites();
       if (currentResults.length > 0) renderRecipes(currentResults);
     });
-    
+
     card.innerHTML = `
       <h3>${emojis} ${recipe.name}</h3>
       <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
-      <p>${recipe.instructions}</p>
+      <p><strong>Instructions:</strong> ${recipe.instructions}</p>
+      <p><strong>Prep Time:</strong> ${recipe.prep_time_min} min | 
+         <strong>Cook Time:</strong> ${recipe.cook_time_min} min | 
+         <strong>Heat:</strong> ${recipe.heat}</p>
+      <p><strong>Nutrition:</strong> ${recipe.nutrition.calories} kcal, 
+         ${recipe.nutrition.protein_g}g protein, 
+         ${recipe.nutrition.fat_g}g fat, 
+         ${recipe.nutrition.carbs_g}g carbs</p>
     `;
+
     card.appendChild(unfavButton);
     favoritesDiv.appendChild(card);
   });
@@ -237,17 +252,10 @@ function renderFavorites() {
 // Initialize & Search
 // -----------------
 async function initializeApp() {
-  console.log("Initializing app...");
   allRecipes = await loadRecipes();
-  console.log("Loaded recipes:", allRecipes);
-  
   const allIngredients = getAllIngredients(allRecipes);
-  console.log("All ingredients:", allIngredients);
-  
   createIngredientBoxes(allIngredients);
   renderFavorites();
-  
-  console.log("App initialized successfully!");
 }
 
 async function performSearch() {
@@ -260,12 +268,8 @@ async function performSearch() {
   }
 
   currentResults = findRecipes(userIngredients, allRecipes, selectedAllergens);
-  console.log("Search results:", currentResults);
   renderRecipes(currentResults);
 }
 
-// -----------------
-// Event Listeners
-// -----------------
 document.getElementById("search-btn").addEventListener("click", performSearch);
 window.addEventListener("load", initializeApp);
