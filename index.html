@@ -10,42 +10,56 @@
   <div class="container">
     <h1>🍳 Recipe Finder</h1>
 
-    <!-- Sign In / Sign Out -->
-    <div class="login-section">
-      <form id="signInForm">
-        <input type="text" id="username" placeholder="Enter username" required>
-        <button type="button" id="signInBtn">Sign In</button>
-      </form>
+    <!-- -----------------
+         Account Section
+    ----------------- -->
+    <div class="login-section" id="accountSection">
+      <div id="signInForm">
+        <h2>Sign In</h2>
+        <input type="text" id="signinUsername" placeholder="Username">
+        <input type="password" id="signinPassword" placeholder="Password">
+        <button id="signInBtn">Sign In</button>
+        <p>Don't have an account? <span id="showSignUp" class="link">Create one</span></p>
+      </div>
+
+      <div id="signUpForm" style="display:none;">
+        <h2>Create Account</h2>
+        <input type="text" id="signupUsername" placeholder="Username">
+        <input type="password" id="signupPassword" placeholder="Password">
+        <button id="signUpBtn">Sign Up</button>
+        <p>Already have an account? <span id="showSignIn" class="link">Sign in</span></p>
+      </div>
+
       <div id="signOutDiv" style="display:none;">
         <p>Signed in as <span id="displayUser"></span></p>
-        <button type="button" id="signOutBtn">Sign Out</button>
+        <button id="signOutBtn">Sign Out</button>
       </div>
     </div>
 
+    <!-- -----------------
+         Dietary Restrictions
+    ----------------- -->
     <div class="section allergy-section">
       <h2>Dietary Restrictions</h2>
       <div class="allergy-filters">
-        <label>
-          <input type="checkbox" class="allergy-filter" value="gluten">
-          Gluten-Free
-        </label>
-        <label>
-          <input type="checkbox" class="allergy-filter" value="nuts">
-          Nut-Free
-        </label>
-        <label>
-          <input type="checkbox" class="allergy-filter" value="dairy">
-          Dairy-Free
-        </label>
+        <label><input type="checkbox" class="allergy-filter" value="gluten"> Gluten-Free</label>
+        <label><input type="checkbox" class="allergy-filter" value="nuts"> Nut-Free</label>
+        <label><input type="checkbox" class="allergy-filter" value="dairy"> Dairy-Free</label>
       </div>
     </div>
 
+    <!-- -----------------
+         Ingredients
+    ----------------- -->
     <div class="section">
       <h2>Select Your Ingredients</h2>
       <div id="ingredients-container"></div>
       <button id="search-btn">Find Recipes</button>
     </div>
 
+    <!-- -----------------
+         Results & Favorites
+    ----------------- -->
     <div class="section">
       <h2>Search Results</h2>
       <div id="results"></div>
