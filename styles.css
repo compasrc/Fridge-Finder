@@ -191,3 +191,70 @@ h2 {
   border-radius: 10px;
   border: 2px dashed #FFD89B;
 }
+
+/* -----------------
+   Sign In / Sign Out
+----------------- */
+.login-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #FFF5E6;
+  border-radius: 15px;
+  border: 2px solid #FFD89B;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#signInForm input[type="text"] {
+  padding: 10px 15px;
+  font-size: 1.1em;
+  border: 2px solid #FFD89B;
+  border-radius: 10px;
+  outline: none;
+  width: 250px;
+  transition: all 0.2s;
+}
+
+#signInForm input[type="text"]:focus {
+  border-color: #FF8C42;
+  box-shadow: 0 0 8px rgba(255, 140, 66, 0.3);
+}
+
+#signInForm button, #signOutBtn {
+  padding: 10px 20px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(135deg, #FFA347 0%, #FF8C42 100%);
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+  transition: all 0.2s;
+}
+
+/* Add emojis to buttons */
+#signInForm button::before {
+  content: "👤 ";
+}
+
+#signOutBtn::before {
+  content: "🔓 ";
+}
+
+#signInForm button:hover, #signOutBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 140, 66, 0.4);
+}
+
+#signInForm button:active, #signOutBtn:active {
+  transform: scale(0.98);
+}
+
+#signOutDiv p {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: #6B4423;
+}
