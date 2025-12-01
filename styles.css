@@ -9,13 +9,13 @@ body {
   background: linear-gradient(135deg, #FFD89B 0%, #FFA347 50%, #FF8C42 100%);
   min-height: 100vh;
   padding: 20px;
-  color: #4A2C2A;
+  color: #4A2C2A; /* Dark brown for text */
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  background: #FFF8F0;
+  background: #FFF8F0; /* Off-white / light paper background */
   border-radius: 20px;
   padding: 30px;
   box-shadow: 0 20px 60px rgba(74, 44, 42, 0.2);
@@ -23,67 +23,64 @@ body {
 
 h1 {
   text-align: center;
-  color: #D2691E;
+  color: #D2691E; /* Deep orange */
   margin-bottom: 30px;
   font-size: 2.5em;
   text-shadow: 2px 2px 4px rgba(255, 140, 66, 0.3);
 }
 
 h2 {
-  color: #B8732E;
+  color: #B8732E; /* Medium brown/orange */
   margin: 30px 0 15px;
   font-size: 1.5em;
 }
 
-/* --- Tab Styles --- */
+/* --- TAB STYLES --- */
 .tabs {
-  display: flex;
-  margin-bottom: 30px;
-  border-bottom: 3px solid #FFD89B;
+  display: flex;
+  margin-bottom: 30px;
+  border-bottom: 3px solid #FFD89B;
 }
 
 .tab-button {
-  flex: 1;
-  padding: 15px 10px;
-  background: #FFF5E6;
-  border: none;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  font-size: 1.1em;
-  font-weight: bold;
-  color: #B8732E;
-  cursor: pointer;
-  transition: all 0.3s;
-  border-bottom: 3px solid transparent;
+  flex: 1;
+  padding: 15px 10px;
+  background: #FFF5E6; /* Light background for inactive tab */
+  border: none;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #B8732E;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-bottom: 3px solid transparent;
 }
 
 .tab-button:hover {
-  background: #FFF0D6;
+  background: #FFF0D6;
 }
 
 .tab-button.active {
-  background: white;
-  border-bottom: 3px solid #FF8C42; /* Highlight active tab */
-  color: #D2691E;
+  background: white;
+  border-bottom: 3px solid #FF8C42; /* Highlight active tab with main accent color */
+  color: #D2691E;
 }
 
-/* Hide inactive content sections */
 .tab-content {
-  display: none;
-  padding: 10px 0;
+  display: none;
+  padding: 10px 0;
 }
 
 .tab-content.active {
-  display: block;
+  display: block;
 }
 
-/* Optional: Clean up the main content sections for tabbed view */
 .tab-content h2 {
-  margin-top: 15px; /* Less space above inner headings */
+  margin-top: 15px;
 }
 
-
-/* Authentication */
+/* --- AUTHENTICATION & SIGNOUT --- */
 .auth-section {
   display: flex;
   flex-direction: column;
@@ -117,7 +114,8 @@ h2 {
   gap: 15px;
 }
 
-.auth-buttons button {
+.auth-buttons button, 
+.signout-section button {
   padding: 10px 20px;
   font-size: 1.1em;
   font-weight: bold;
@@ -130,7 +128,8 @@ h2 {
   transition: all 0.2s;
 }
 
-.auth-buttons button:hover {
+.auth-buttons button:hover,
+.signout-section button:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 16px rgba(255, 140, 66, 0.4);
 }
@@ -140,7 +139,6 @@ h2 {
   font-weight: 500;
 }
 
-/* Sign Out */
 .signout-section {
   display: flex;
   justify-content: space-between;
@@ -152,23 +150,7 @@ h2 {
   border: 2px solid #FFD89B;
 }
 
-.signout-section button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  background: linear-gradient(135deg, #FFA347 0%, #FF8C42 100%);
-  color: white;
-  transition: all 0.2s;
-}
-
-.signout-section button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
-}
-
-/* Ingredients */
+/* --- INGREDIENTS & ALLERGY FILTERS --- */
 #ingredients-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -203,30 +185,31 @@ h2 {
   box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
 }
 
-/* Allergy Filters */
 .allergy-filters {
-  margin-bottom: 20px;
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
+  margin-bottom: 20px; /* Added margin for consistency */
 }
 
 .allergy-filters label {
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
   font-size: 1.1em;
   color: #6B4423;
-  cursor: pointer;
 }
 
 .allergy-filters input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
   cursor: pointer;
-  width: 18px;
-  height: 18px;
+  accent-color: #FF8C42;
 }
 
-/* Search Button */
+
+/* --- SEARCH BUTTON --- */
 #search-btn {
   width: 100%;
   padding: 15px;
@@ -251,12 +234,7 @@ h2 {
   transform: scale(0.98);
 }
 
-/* Sections */
-.section {
-  margin-top: 15px; /* Reduced margin due to tabs */
-}
-
-/* Recipe Cards */
+/* --- RECIPE CARDS & RESULTS --- */
 .recipe-card {
   background: white;
   border: 2px solid #FFE4C4;
@@ -288,21 +266,28 @@ h2 {
   color: #B8732E;
 }
 
-.fav-btn {
+/* Recipe Buttons (Favorites, Comments, Plan) */
+.recipe-card > div {
+    margin-top: 15px;
+}
+
+.fav-btn, .comment-btn, .add-to-plan-btn {
   margin-top: 10px;
-  margin-right: 10px;
+  margin-right: 10px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1em;
   transition: all 0.2s;
-  color: #6B4423;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
+.fav-btn {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); /* Gold/Yellow */
+  color: #6B4423;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
 .fav-btn:hover {
   background: linear-gradient(135deg, #FFED4E 0%, #FFB900 100%);
   transform: scale(1.05);
@@ -310,20 +295,10 @@ h2 {
 }
 
 .comment-btn {
-  margin-top: 10px;
-  margin-right: 10px;
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1em;
-  transition: all 0.2s;
+  background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%); /* Light/Dark Blue */
   color: white;
-  font-weight: 600;
   box-shadow: 0 2px 8px rgba(70, 130, 180, 0.3);
 }
-
 .comment-btn:hover {
   background: linear-gradient(135deg, #ADD8E6 0%, #5B9BD5 100%);
   transform: scale(1.05);
@@ -331,39 +306,142 @@ h2 {
 }
 
 .add-to-plan-btn {
-  margin-top: 10px;
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #90EE90 0%, #32CD32 100%);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1em;
-  transition: all 0.2s;
+  background: linear-gradient(135deg, #90EE90 0%, #32CD32 100%); /* Light/Dark Green */
   color: white;
-  font-weight: 600;
   box-shadow: 0 2px 8px rgba(50, 205, 50, 0.3);
 }
-
 .add-to-plan-btn:hover {
   background: linear-gradient(135deg, #98FB98 0%, #3CB371 100%);
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(50, 205, 50, 0.4);
 }
 
+
+#results, #favorites {
+  min-height: 50px;
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
 .no-results {
   text-align: center;
-  padding: 30px;
   color: #B8732E;
+  font-size: 1.2em;
+  padding: 40px;
+  background: #FFF8EB;
+  border-radius: 10px;
+  border: 2px dashed #FFD89B;
+}
+
+/* --- WEEKLY MEAL PLAN --- */
+.meal-plan-intro {
+  background: #FFF5E6;
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #FFD89B;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.meal-plan-intro p {
+  margin-bottom: 15px;
+  color: #6B4423;
   font-size: 1.1em;
 }
 
-/* Recipe Comments Section */
+.suggest-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #9370DB 0%, #8A2BE2 100%); /* Purple accent */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+}
+
+.suggest-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(138, 43, 226, 0.4);
+}
+
+.weekly-plan {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.day-card {
+  background: white;
+  border: 2px solid #FFE4C4;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.15);
+}
+
+.day-card h3 {
+  color: #D2691E;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+  border-bottom: 2px solid #FFD89B;
+  padding-bottom: 10px;
+}
+
+.meal-slot {
+  background: #FFF8EB;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 2px dashed #FFD89B;
+  min-height: 60px;
+}
+
+.meal-slot.filled {
+  border: 2px solid #32CD32; /* Green border for filled slots */
+  background: #F0FFF0;
+}
+
+.meal-slot-header {
+  font-weight: bold;
+  color: #B8732E;
+  margin-bottom: 8px;
+}
+
+.meal-item {
+  color: #6B4423;
+  font-size: 0.95em;
+  padding: 5px;
+  background: white;
+  border-radius: 5px;
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remove-meal {
+  color: red;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9em;
+  padding: 0 5px;
+}
+
+.remove-meal:hover {
+  color: darkred;
+}
+
+/* --- RECIPE COMMENTS (within card) --- */
 .recipe-comments {
   margin-top: 15px;
   padding: 15px;
-  background: #F5F5DC;
+  background: #FFFEFA; /* Lighter than main content */
   border-radius: 10px;
-  border: 1px solid #FFD89B;
+  border: 1px solid #FFE4C4;
 }
 
 .recipe-comments h4 {
@@ -399,24 +477,17 @@ h2 {
   transition: all 0.2s;
 }
 
-.recipe-comment-input button:hover {
-  transform: scale(1.05);
-}
-
 .recipe-comment {
   padding: 10px;
-  background: white;
+  background: #FFF8EB;
   border-radius: 8px;
   margin-bottom: 8px;
   font-size: 0.9em;
   color: #6B4423;
 }
 
-.recipe-comment strong {
-  color: #D2691E;
-}
 
-/* Community Comments */
+/* --- GENERAL COMMUNITY COMMENTS --- */
 #commentSection {
   display: flex;
   flex-direction: column;
@@ -467,104 +538,7 @@ h2 {
   color: #D2691E;
 }
 
-/* Weekly Meal Plan */
-.meal-plan-intro {
-  background: #FFF5E6;
-  padding: 20px;
-  border-radius: 15px;
-  border: 2px solid #FFD89B;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.meal-plan-intro p {
-  margin-bottom: 15px;
-  color: #6B4423;
-  font-size: 1.1em;
-}
-
-.suggest-btn {
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #9370DB 0%, #8A2BE2 100%);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.1em;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
-}
-
-.suggest-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(138, 43, 226, 0.4);
-}
-
-.weekly-plan {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 15px;
-}
-
-.day-card {
-  background: white;
-  border: 2px solid #FFE4C4;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.15);
-}
-
-.day-card h3 {
-  color: #D2691E;
-  margin-bottom: 15px;
-  font-size: 1.3em;
-  border-bottom: 2px solid #FFD89B;
-  padding-bottom: 10px;
-}
-
-.meal-slot {
-  background: #FFF8EB;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  border: 2px dashed #FFD89B;
-  min-height: 60px;
-}
-
-.meal-slot.filled {
-  border: 2px solid #90EE90;
-  background: #F0FFF0;
-}
-
-.meal-slot-header {
-  font-weight: bold;
-  color: #B8732E;
-  margin-bottom: 8px;
-}
-
-.meal-item {
-  color: #6B4423;
-  font-size: 0.95em;
-  padding: 5px;
-  background: white;
-  border-radius: 5px;
-  margin-top: 5px;
-}
-
-.remove-meal {
-  float: right;
-  color: red;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9em;
-}
-
-.remove-meal:hover {
-  color: darkred;
-}
-
-/* Day selector modal */
+/* --- DAY SELECTOR MODAL --- */
 .day-selector-modal {
   display: none;
   position: fixed;
@@ -572,7 +546,7 @@ h2 {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(74, 44, 42, 0.6); /* Darker overlay */
   z-index: 1000;
   justify-content: center;
   align-items: center;
@@ -598,7 +572,7 @@ h2 {
 
 .day-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-bottom: 20px;
 }
