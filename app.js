@@ -10,9 +10,120 @@ async function loadRecipes() {
 function getAllIngredients(recipes) {
   const ingredients = new Set();
   recipes.forEach(recipe => {
-    recipe.ingredients.forEach(ingredient => ingredients.add(ingredient.toLowerCase()));
+    recipe.ingredients.forEach(ingredient => {
+      // Normalize ingredient by removing trailing 's' for common plurals
+      let normalized = ingredient.toLowerCase().trim();
+      
+      // Simple pluralization handling - remove trailing 's' or 'es'
+      if (normalized.endsWith('s') && normalized.length > 3) {
+        // Don't remove 's' from words that should stay plural (like 'peas', 'lentils')
+        const keepPlural = ['peas', 'beans', 'lentils', 'oats', 'grits', 'olives'];
+        if (!keepPlural.includes(normalized)) {
+          // Check if it ends with 'es' or just 's'
+          if (normalized.endsWith('es') && normalized.length > 4) {
+            // For words ending in 'oes', 'ies', 'ches', 'shes', remove 'es'
+            const beforeEs = normalized.slice(-3, -2);
+            if (['o', 'h'].includes(beforeEs) || normalized.endsWith('ies')) {
+              normalized = normalized.slice(0, -2);
+            } else {
+              normalized = normalized.slice(0, -1);
+            }
+          } else {
+            normalized = normalized.slice(0, -1);
+          }
+        }
+      }
+      
+      ingredients.add(normalized);
+    });
   });
   return Array.from(ingredients).sort();
+}
+
+function categorizeIngredients(ingredients) {
+  const categories = {
+    'Proteins': [],
+    'Dairy & Eggs': [],
+    'Vegetables': [],
+    'Fruits': [],
+    'Grains & Pasta': [],
+    'Herbs & Spices': [],
+    'Condiments & Oils': [],
+    'Other': []
+  };
+
+  const categoryMap = {
+    // Proteins
+    'chicken': 'Proteins', 'beef': 'Proteins', 'pork': 'Proteins', 'lamb': 'Proteins',
+    'fish': 'Proteins', 'salmon': 'Proteins', 'tuna': 'Proteins', 'cod': 'Proteins',
+    'shrimp': 'Proteins', 'prawn': 'Proteins', 'bacon': 'Proteins', 'sausage': 'Proteins',
+    'turkey': 'Proteins', 'duck': 'Proteins', 'ham': 'Proteins',
+    
+    // Dairy & Eggs
+    'cheese': 'Dairy & Eggs', 'milk': 'Dairy & Eggs', 'butter': 'Dairy & Eggs', 
+    'cream': 'Dairy & Eggs', 'yogurt': 'Dairy & Eggs', 'egg': 'Dairy & Eggs',
+    'parmesan': 'Dairy & Eggs', 'mozzarella': 'Dairy & Eggs', 'cheddar': 'Dairy & Eggs',
+    
+    // Vegetables
+    'tomato': 'Vegetables', 'onion': 'Vegetables', 'garlic': 'Vegetables', 
+    'potato': 'Vegetables', 'carrot': 'Vegetables', 'pepper': 'Vegetables',
+    'mushroom': 'Vegetables', 'broccoli': 'Vegetables', 'spinach': 'Vegetables',
+    'celery': 'Vegetables', 'lettuce': 'Vegetables', 'cucumber': 'Vegetables',
+    'zucchini': 'Vegetables', 'eggplant': 'Vegetables', 'cabbage': 'Vegetables',
+    'peas': 'Vegetables', 'beans': 'Vegetables', 'corn': 'Vegetables',
+    
+    // Fruits
+    'lemon': 'Fruits', 'lime': 'Fruits', 'apple': 'Fruits', 'banana': 'Fruits',
+    'orange': 'Fruits', 'strawberry': 'Fruits', 'avocado': 'Fruits',
+    'tomatoes': 'Fruits', 'olives': 'Fruits',
+    
+    // Grains & Pasta
+    'rice': 'Grains & Pasta', 'pasta': 'Grains & Pasta', 'noodle': 'Grains & Pasta',
+    'bread': 'Grains & Pasta', 'flour': 'Grains & Pasta', 'oats': 'Grains & Pasta',
+    'couscous': 'Grains & Pasta', 'quinoa': 'Grains & Pasta',
+    
+    // Herbs & Spices
+    'basil': 'Herbs & Spices', 'oregano': 'Herbs & Spices', 'thyme': 'Herbs & Spices',
+    'rosemary': 'Herbs & Spices', 'parsley': 'Herbs & Spices', 'cilantro': 'Herbs & Spices',
+    'mint': 'Herbs & Spices', 'sage': 'Herbs & Spices', 'dill': 'Herbs & Spices',
+    'paprika': 'Herbs & Spices', 'cumin': 'Herbs & Spices', 'coriander': 'Herbs & Spices',
+    'curry': 'Herbs & Spices', 'chili': 'Herbs & Spices', 'ginger': 'Herbs & Spices',
+    'cinnamon': 'Herbs & Spices', 'nutmeg': 'Herbs & Spices', 'pepper': 'Herbs & Spices',
+    
+    // Condiments & Oils
+    'oil': 'Condiments & Oils', 'olive oil': 'Condiments & Oils', 'vinegar': 'Condiments & Oils',
+    'soy sauce': 'Condiments & Oils', 'sauce': 'Condiments & Oils', 'stock': 'Condiments & Oils',
+    'broth': 'Condiments & Oils', 'ketchup': 'Condiments & Oils', 'mustard': 'Condiments & Oils',
+    'mayonnaise': 'Condiments & Oils', 'honey': 'Condiments & Oils', 'sugar': 'Condiments & Oils',
+    'salt': 'Condiments & Oils', 'wine': 'Condiments & Oils'
+  };
+
+  ingredients.forEach(ingredient => {
+    let categorized = false;
+    
+    // Check if ingredient matches any key in categoryMap
+    for (const [key, category] of Object.entries(categoryMap)) {
+      if (ingredient.includes(key)) {
+        categories[category].push(ingredient);
+        categorized = true;
+        break;
+      }
+    }
+    
+    if (!categorized) {
+      categories['Other'].push(ingredient);
+    }
+  });
+
+  // Sort ingredients within each category and remove empty categories
+  const result = {};
+  for (const [category, items] of Object.entries(categories)) {
+    if (items.length > 0) {
+      result[category] = items.sort();
+    }
+  }
+  
+  return result;
 }
 
 function createIngredientBoxes(ingredients) {
@@ -24,13 +135,32 @@ function createIngredientBoxes(ingredients) {
     return;
   }
   
-  ingredients.forEach(ingredient => {
-    const box = document.createElement("div");
-    box.className = "ingredient-box";
-    box.textContent = ingredient;
-    box.addEventListener("click", () => box.classList.toggle("selected"));
-    container.appendChild(box);
-  });
+  const categorized = categorizeIngredients(ingredients);
+  
+  // Create sections for each category
+  for (const [category, items] of Object.entries(categorized)) {
+    const categorySection = document.createElement("div");
+    categorySection.className = "ingredient-category";
+    
+    const categoryTitle = document.createElement("h3");
+    categoryTitle.className = "category-title";
+    categoryTitle.textContent = category;
+    categorySection.appendChild(categoryTitle);
+    
+    const categoryGrid = document.createElement("div");
+    categoryGrid.className = "ingredient-grid";
+    
+    items.forEach(ingredient => {
+      const box = document.createElement("div");
+      box.className = "ingredient-box";
+      box.textContent = ingredient;
+      box.addEventListener("click", () => box.classList.toggle("selected"));
+      categoryGrid.appendChild(box);
+    });
+    
+    categorySection.appendChild(categoryGrid);
+    container.appendChild(categorySection);
+  }
 }
 
 function getSelectedIngredients() {
@@ -99,8 +229,14 @@ function renderRecipes(recipes) {
 
     card.innerHTML = `
       <h3>${recipe.name}</h3>
-      <p><strong>Ingredients:</strong><br>${ingredientsList}</p>
-      <p><strong>Instructions:</strong><br>${formattedInstructions}</p>
+      <div class="ingredients-list">
+        <strong>Ingredients:</strong><br>
+        ${ingredientsList}
+      </div>
+      <div class="instructions-section">
+        <strong>Instructions:</strong><br>
+        ${formattedInstructions}
+      </div>
     `;
     card.appendChild(favButton);
     resultsDiv.appendChild(card);
@@ -164,8 +300,14 @@ function renderFavorites() {
     
     card.innerHTML = `
       <h3>${recipe.name}</h3>
-      <p><strong>Ingredients:</strong><br>${ingredientsList}</p>
-      <p><strong>Instructions:</strong><br>${formattedInstructions}</p>
+      <div class="ingredients-list">
+        <strong>Ingredients:</strong><br>
+        ${ingredientsList}
+      </div>
+      <div class="instructions-section">
+        <strong>Instructions:</strong><br>
+        ${formattedInstructions}
+      </div>
     `;
     card.appendChild(unfavButton);
     favoritesDiv.appendChild(card);

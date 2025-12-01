@@ -9,7 +9,9 @@ const RemoteRecipes = {
     'chicken', 'beef', 'pork', 'fish', 'salmon',
     'rice', 'pasta', 'potato', 'tomato', 'onion',
     'garlic', 'cheese', 'egg', 'milk', 'butter',
-    'bread', 'carrot', 'mushroom', 'pepper', 'lemon'
+    'bread', 'carrot', 'mushroom', 'pepper', 'lemon',
+    'lamb', 'shrimp', 'bacon', 'broccoli', 'spinach',
+    'avocado', 'corn', 'beans', 'apple', 'strawberry'
   ],
 
   // Fetch recipes by ingredient
@@ -62,6 +64,9 @@ const RemoteRecipes = {
     // Format instructions consistently
     let instructions = meal.strInstructions || 'No instructions available.';
     
+    // Remove timing information lines
+    instructions = instructions.replace(/(?:^|\n)\s*(?:Prep|Cook|Ready|Total)[:›].+?(?:\n|$)/gi, '\n');
+    
     // Split by common delimiters (newlines, periods followed by capital letters, or numbered steps)
     const steps = instructions
       .split(/\r?\n|(?<=[.!?])\s+(?=[A-Z])|(?:^|\s)(?:\d+\.|\d+\))\s*/)
@@ -93,7 +98,7 @@ const RemoteRecipes = {
       const meals = await this.fetchByIngredient(ingredient);
       
       // Get full details for first few meals from each ingredient
-      const mealsToFetch = meals.slice(0, 3);
+      const mealsToFetch = meals.slice(0, 5);
       
       for (const meal of mealsToFetch) {
         if (!allMeals.has(meal.idMeal)) {
