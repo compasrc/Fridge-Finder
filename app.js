@@ -136,6 +136,7 @@ function showAuth(){
 
 // Attach event listeners for auth buttons
 signInBtn.addEventListener('click', ()=>{
+    // FIX: Correctly reading values at the time of click
     const user = usernameInput.value.trim();
     const pass = passwordInput.value;
     
@@ -154,6 +155,7 @@ signInBtn.addEventListener('click', ()=>{
 });
 
 signUpBtn.addEventListener('click', ()=>{
+    // FIX: Correctly reading values at the time of click
     const user = usernameInput.value.trim();
     const pass = passwordInput.value;
     
@@ -247,9 +249,8 @@ function findRecipes(selectedIngredients,selectedAllergens){
             if(allergensMatch(recipeIngredients,allergen)) return false; 
         }
         
-        // 2. Inventory Matching Logic (Recipe must contain all selected ingredients)
+        // 2. Inventory Matching Logic (Recipe must contain ALL selected ingredients)
         if (selectedIngredients.length > 0) {
-            // FIX: Check if ALL selected ingredients are included in the recipe's ingredients.
             return selectedIngredients.every(i => recipeIngredients.includes(i));
         }
 
@@ -567,4 +568,4 @@ window.addEventListener('load',async()=>{
     } else {
         showAuth();
     }
-}); // <-- Final closing brackets added here
+});
