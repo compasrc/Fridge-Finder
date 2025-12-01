@@ -358,6 +358,7 @@ input[type="text"], input[type="password"], textarea {
 /* -----------------------------------------------------------
    Modals
    ----------------------------------------------------------- */
+
 .modal-overlay {
     display: none;
     position: fixed;
@@ -421,3 +422,4 @@ input[type="text"], input[type="password"], textarea {
     border-radius: 8px;
     padding: 5px;
 }
+
