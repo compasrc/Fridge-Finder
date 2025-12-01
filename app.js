@@ -459,6 +459,21 @@ searchBtn.addEventListener('click',()=>{
     renderRecipes(currentResults, 'results');
 });
 
+/* ---------------------------
+   Utility: initial UI setup
+--------------------------- */
+(function initialSetup() {
+    // Start at auth
+    showAuth();
+
+    // Pre-render weekly plan structure so the tab looks ready after login
+    // It will be called again on login to reset state.
+    // Avoid rendering before login to prevent content visible on auth screen
+    // (we only call renderWeeklyPlan after login).
+
+    // Tabs will be initialized on sign-in.
+})();
+
 // ---------------------------
 // Initialize
 // ---------------------------
@@ -477,4 +492,5 @@ window.addEventListener('load',async()=>{
         showAuth();
     }
 });
+
 
