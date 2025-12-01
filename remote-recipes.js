@@ -40,6 +40,19 @@ const RemoteRecipes = {
     }
   },
 
+  // Fetch recipes by cuisine area
+  async fetchByArea(area) {
+    try {
+      const response = await fetch(`${this.baseUrl}/filter.php?a=${encodeURIComponent(area)}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      return data.meals || [];
+    } catch (error) {
+      console.error(`Error fetching recipes for area ${area}:`, error);
+      return [];
+    }
+  },
+
   // Normalize TheMealDB recipe to our format
   normalizeRecipe(meal) {
     const ingredients = [];
@@ -88,16 +101,51 @@ const RemoteRecipes = {
     };
   },
 
-  // Load a diverse set of recipes from multiple ingredients
+  // Fetch recipes by category (much faster than ingredient search)
+  async fetchByCategory(category) {
+    try {
+      const response = await fetch(`${this.baseUrl}/filter.php?c=${encodeURIComponent(category)}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      return data.meals || [];
+    } catch (error) {
+      console.error(`Error fetching recipes for category ${category}:`, error);
+      return [];
+    }
+  },
+
+  // Load a diverse set of recipes using familiar cuisines (much faster)
   async loadDiverseRecipes() {
     console.log('Fetching recipes from TheMealDB...');
     const allMeals = new Map(); // Use Map to deduplicate by ID
-
-    // Fetch recipes for each common ingredient
-    for (const ingredient of this.commonIngredients) {
-      const meals = await this.fetchByIngredient(ingredient);
+    
+    // Use familiar cuisines - American, British, Italian, French tend to have more recognizable recipes
+    const areas = ['American', 'British', 'Italian', 'French', 'Mexican'];
+    const categories = ['Chicken', 'Beef', 'Pasta'];
+    
+    // Fetch from familiar cuisines
+    for (const area of areas) {
+      console.log(`Fetching ${area} recipes...`);
+      const meals = await this.fetchByArea(area);
       
-      // Get full details for first few meals from each ingredient
+      // Get details for first 8 recipes from each area
+      const mealsToFetch = meals.slice(0, 8);
+      
+      for (const meal of mealsToFetch) {
+        if (!allMeals.has(meal.idMeal)) {
+          const details = await this.fetchRecipeDetails(meal.idMeal);
+          if (details) {
+            allMeals.set(meal.idMeal, this.normalizeRecipe(details));
+          }
+        }
+      }
+    }
+    
+    // Add some popular categories too
+    for (const category of categories) {
+      console.log(`Fetching ${category} recipes...`);
+      const meals = await this.fetchByCategory(category);
+      
       const mealsToFetch = meals.slice(0, 5);
       
       for (const meal of mealsToFetch) {

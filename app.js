@@ -179,20 +179,30 @@ function getSelectedAllergens() {
 function findRecipes(userIngredients, recipes, selectedAllergens) {
   if (userIngredients.length === 0) return [];
 
-  return recipes.filter(recipe => {
-    const recipeIngredients = recipe.ingredients.map(i => i.toLowerCase());
+  return recipes
+    .map(recipe => {
+      const recipeIngredients = recipe.ingredients.map(i => i.toLowerCase());
 
-    // exclude allergens
-    for (const allergen of selectedAllergens) {
-      if (recipeIngredients.some(i => {
-        if (allergen === "gluten") return i.includes("bread") || i.includes("pasta") || i.includes("naan");
-        if (allergen === "nuts") return i.includes("nuts") || i.includes("peanut") || i.includes("almond");
-        if (allergen === "dairy") return i.includes("cheese") || i.includes("milk") || i.includes("butter");
-        return false;
-      })) return false;
-    }
-    return recipeIngredients.every(i => userIngredients.includes(i));
-  });
+      // exclude allergens
+      for (const allergen of selectedAllergens) {
+        if (recipeIngredients.some(i => {
+          if (allergen === "gluten") return i.includes("bread") || i.includes("pasta") || i.includes("naan");
+          if (allergen === "nuts") return i.includes("nuts") || i.includes("peanut") || i.includes("almond");
+          if (allergen === "dairy") return i.includes("cheese") || i.includes("milk") || i.includes("butter");
+          return false;
+        })) return null;
+      }
+
+      // Calculate how many ingredients the user has
+      const matchCount = recipeIngredients.filter(i => userIngredients.includes(i)).length;
+      const matchRatio = matchCount / recipeIngredients.length;
+
+      // Return recipe with match score
+      return { recipe, matchRatio, matchCount, totalIngredients: recipeIngredients.length };
+    })
+    .filter(item => item !== null && item.matchRatio >= 0.5) // Show recipes where user has at least 50% of ingredients
+    .sort((a, b) => b.matchRatio - a.matchRatio) // Sort by best match first
+    .map(item => item.recipe);
 }
 
 // -----------------
