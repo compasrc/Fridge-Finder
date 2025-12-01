@@ -206,9 +206,13 @@ function createIngredientBoxes(){
     });
 }
 
+/**
+ * FIX 1: Robustly extracts the clean ingredient string from selected boxes.
+ * Uses a regex to strip non-alphabetic/non-space characters, ensuring clean strings like 'cheese'.
+ */
 function getSelectedIngredients(){ 
     return Array.from(document.querySelectorAll('#ingredients-container .ingredient-box.selected'))
-        .map(b=>b.textContent.replace(/[^\w\s]/g,'').trim().toLowerCase()); 
+        .map(b => b.textContent.replace(/[^a-z\s]/gi, '').trim().toLowerCase()); 
 }
 function getSelectedAllergens(){ return Array.from(document.querySelectorAll('.allergy-filter:checked')).map(b=>b.value.toLowerCase()); }
 
@@ -226,7 +230,14 @@ function findRecipes(selectedIngredients,selectedAllergens){
         
         // 2. Must include all selected ingredients
         if (selectedIngredients.length > 0) {
-            return selectedIngredients.every(sel => ing.includes(sel));
+            /**
+             * FIX 2: Corrected Filtering Logic.
+             * Ensures ALL selected ingredients (sel) must be contained WITHIN 
+             * at least one of the recipe's ingredients (recipeIng).
+             */
+            return selectedIngredients.every(sel => 
+                ing.some(recipeIng => recipeIng.includes(sel))
+            );
         }
         
         // If no ingredients are selected, and no allergens filter it, it passes
@@ -302,13 +313,12 @@ function createRecipeCard(recipe, isFavoriteView=false){
     const favBtnClass = isFavorited ? 'fav-btn favorited' : 'fav-btn';
     const favBtnText = isFavorited ? '❤️ Favorited' : '🤍 Favorite';
     
-    // *** Defensive Coding Fix Applied Here ***
-    // Use optional chaining (?.) and nullish coalescing (??) to safely access nutrition data
+    // Defensive Coding Fix Applied
     const calories = recipe.nutrition?.calories ?? 'N/A';
     const protein = recipe.nutrition?.protein_g ?? 'N/A';
     const fat = recipe.nutrition?.fat_g ?? 'N/A';
     const carbs = recipe.nutrition?.carbs_g ?? 'N/A';
-    // *** End Fix ***
+    // End Fix
 
     card.innerHTML = `
         <h3>${emojis} ${recipe.name}</h3>
@@ -517,12 +527,18 @@ searchBtn.addEventListener('click',()=>{
     const selectedIngredients=getSelectedIngredients();
     const selectedAllergens=getSelectedAllergens();
     
+    // Debugging logs added here for verification
+    console.log("Search button clicked!");
+    console.log("Selected Ingredients:", selectedIngredients);
+    console.log("Selected Allergens:", selectedAllergens);
+    
     if(!selectedIngredients.length && !selectedAllergens.length){ 
         alert('Select at least one ingredient or allergen filter!'); 
         return; 
     }
     
     currentResults=findRecipes(selectedIngredients,selectedAllergens);
+    console.log("Found Recipes:", currentResults.length);
     renderRecipes(currentResults, 'results');
 });
 
