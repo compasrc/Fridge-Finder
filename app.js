@@ -106,7 +106,7 @@ function getIngredientEmoji(ingredient) {
 }
 
 // -----------------
-// Authentication Logic (Unchanged)
+// Authentication Logic 
 // -----------------
 function showMainContent(username){
     authDiv.style.display='none';
@@ -152,7 +152,7 @@ signUpBtn.addEventListener('click', ()=>{
 signOutBtn.addEventListener('click', ()=>{ showAuth(); });
 
 // -----------------
-// Tabs Logic (Unchanged)
+// Tabs Logic 
 // -----------------
 function switchTab(tabId) {
     tabContents.forEach(content => content.style.display = 'none');
@@ -205,10 +205,6 @@ function createIngredientBoxes(){
     });
 }
 
-/**
- * Retains the robust cleaning logic to ensure clean strings like 'cheese' 
- * are extracted from the ingredient boxes.
- */
 function getSelectedIngredients(){ 
     return Array.from(document.querySelectorAll('#ingredients-container .ingredient-box.selected'))
         .map(b => b.textContent.replace(/[^a-z\s]/gi, '').trim().toLowerCase()); 
@@ -219,25 +215,27 @@ function getSelectedAllergens(){ return Array.from(document.querySelectorAll('.a
 // Recipe Filtering
 // -----------------
 function findRecipes(selectedIngredients,selectedAllergens){
-    if (selectedIngredients.length === 0) return []; // Old code's initial check
+    if (selectedIngredients.length === 0 && selectedAllergens.length === 0) return allRecipes; // Return all if no filters applied
 
     return allRecipes.filter(recipe=>{
         const recipeIngredients = recipe.ingredients.map(i=>i.toLowerCase());
         
-        // 1. Check allergens first (Logic retained)
+        // 1. Check allergens first
         for(const allergen of selectedAllergens){ 
             if(allergensMatch(recipeIngredients,allergen)) return false; 
         }
         
-        // 2. IMPLEMENTS THE OLD, WORKING LOGIC:
-        // A recipe matches IF AND ONLY IF every single ingredient it requires 
-        // is present in the user's selected list. (Inventory Matching)
-        return recipeIngredients.every(i => selectedIngredients.includes(i));
+        // 2. Inventory Matching Logic (Recipe ingredients must be subset of selected ingredients)
+        if (selectedIngredients.length > 0) {
+            return recipeIngredients.every(i => selectedIngredients.includes(i));
+        }
+
+        // If no ingredients are selected, but an allergen filter was applied, the recipe passed the allergen filter
+        return true; 
     });
 }
 
 function allergensMatch(recipeIngredients,allergen){
-    // This logic is retained and slightly consolidated
     if(allergen==='gluten') return recipeIngredients.some(i=>i.includes('bread')||i.includes('pasta')||i.includes('naan')||i.includes('flour') || i.includes('oats'));
     if(allergen==='nuts') return recipeIngredients.some(i=>i.includes('nuts')||i.includes('peanut')||i.includes('almond')||i.includes('pecan'));
     if(allergen==='dairy') return recipeIngredients.some(i=>i.includes('cheese')||i.includes('milk')||i.includes('butter')||i.includes('cream')||i.includes('mayonnaise'));
@@ -340,11 +338,18 @@ function createRecipeCard(recipe, isFavoriteView=false){
     return card;
 }
 
+/**
+ * FIX: This function now correctly iterates over the found recipes and 
+ * calls createRecipeCard to render them to the DOM.
+ */
 function renderRecipes(recipes, containerId='results', isFavoriteView = false){
     const container = document.getElementById(containerId);
-    container.innerHTML='';
+    container.innerHTML=''; // Clear existing content (e.g., "No matches found")
 
-    if(!recipes.length){ container.innerHTML='<div class="no-results">No recipes found. Try adjusting your selections!</div>'; return; }
+    if(!recipes.length){ 
+        container.innerHTML='<div class="no-results">No recipes found. Try adjusting your selections!</div>'; 
+        return; 
+    }
 
     recipes.forEach(recipe=>{
         const card = createRecipeCard(recipe, isFavoriteView);
@@ -526,7 +531,6 @@ searchBtn.addEventListener('click',()=>{
         return; 
     }
 
-    // Pass the cleaned ingredients to the fixed filtering function
     currentResults=findRecipes(selectedIngredients,selectedAllergens);
     console.log("Found Recipes:", currentResults.length);
     renderRecipes(currentResults, 'results');
