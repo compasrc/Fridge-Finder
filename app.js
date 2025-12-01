@@ -100,7 +100,7 @@ function saveMealPlan(username, mealPlan) { localStorage.setItem(`mealPlan_${use
 // Emoji mapping (for warm icons)
 // -----------------
 function getIngredientEmoji(ingredient) {
-    const mapping = { "bread":"🥖","pasta":"🍝","cheese":"🧀","milk":"🥛","nuts":"🌰","eggs":"🥚","butter":"🧈","avocado":"🥑","tomato":"🍅","banana":"🍌","strawberry":"🍓","lettuce":"🥬","rice":"🍚","peanut butter":"🥜","jelly":"🍇","naan":"🍞","soy sauce":"🧂","olive oil":"🫒","salt":"🧂","tomato sauce":"🍅","chicken":"🍗","beef":"🥩","pork":"🥓","fish":"🐟"};
+    const mapping = { "bread":"🥖","pasta":"🍝","cheese":"🧀","milk":"🥛","nuts":"🌰","eggs":"🥚","butter":"🧈","avocado":"🥑","tomato":"🍅","banana":"🍌","strawberry":"🍓","lettuce":"🥬","rice":"🍚","peanut butter":"🥜","jelly":"🍇","naan":"🍞","soy sauce":"🧂","olive oil":"🫒","salt":"🧂","tomato sauce":"🍅","chicken":"🍗","beef":"🥩","pork":"🥓","fish":"🐟","tuna":"🐟"};
     for(const key in mapping){ if(ingredient.toLowerCase().includes(key)) return mapping[key]; }
     return "";
 }
@@ -225,14 +225,19 @@ function findRecipes(selectedIngredients,selectedAllergens){
         }
         
         // 2. Must include all selected ingredients
-        return selectedIngredients.every(sel => ing.includes(sel));
+        if (selectedIngredients.length > 0) {
+            return selectedIngredients.every(sel => ing.includes(sel));
+        }
+        
+        // If no ingredients are selected, and no allergens filter it, it passes
+        return true; 
     });
 }
 
 function allergensMatch(recipeIngredients,allergen){
-    if(allergen==='gluten') return recipeIngredients.some(i=>i.includes('bread')||i.includes('pasta')||i.includes('naan')||i.includes('flour'));
+    if(allergen==='gluten') return recipeIngredients.some(i=>i.includes('bread')||i.includes('pasta')||i.includes('naan')||i.includes('flour') || i.includes('oats'));
     if(allergen==='nuts') return recipeIngredients.some(i=>i.includes('nuts')||i.includes('peanut')||i.includes('almond')||i.includes('pecan'));
-    if(allergen==='dairy') return recipeIngredients.some(i=>i.includes('cheese')||i.includes('milk')||i.includes('butter')||i.includes('cream'));
+    if(allergen==='dairy') return recipeIngredients.some(i=>i.includes('cheese')||i.includes('milk')||i.includes('butter')||i.includes('cream')||i.includes('mayonnaise'));
     return false;
 }
 
@@ -296,6 +301,14 @@ function createRecipeCard(recipe, isFavoriteView=false){
     const isFavorited = currentUser ? getFavorites(currentUser).some(f=>f.name===recipe.name) : false;
     const favBtnClass = isFavorited ? 'fav-btn favorited' : 'fav-btn';
     const favBtnText = isFavorited ? '❤️ Favorited' : '🤍 Favorite';
+    
+    // *** Defensive Coding Fix Applied Here ***
+    // Use optional chaining (?.) and nullish coalescing (??) to safely access nutrition data
+    const calories = recipe.nutrition?.calories ?? 'N/A';
+    const protein = recipe.nutrition?.protein_g ?? 'N/A';
+    const fat = recipe.nutrition?.fat_g ?? 'N/A';
+    const carbs = recipe.nutrition?.carbs_g ?? 'N/A';
+    // *** End Fix ***
 
     card.innerHTML = `
         <h3>${emojis} ${recipe.name}</h3>
@@ -303,7 +316,7 @@ function createRecipeCard(recipe, isFavoriteView=false){
             <p><strong>Ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
             <p><strong>Instructions:</strong> ${recipe.instructions.substring(0, 100)}...</p>
             <p><strong>Time:</strong> ${recipe.prep_time_min} min prep, ${recipe.cook_time_min} min cook</p>
-            <p><strong>Nutrition:</strong> ${recipe.nutrition.calories} kcal</p>
+            <p><strong>Nutrition:</strong> ${calories} kcal (P: ${protein}g, F: ${fat}g, C: ${carbs}g)</p>
         </div>
         <div class="recipe-actions">
             ${currentUser ? `<button class="${favBtnClass}" data-action="favorite">${favBtnText}</button>` : ''}
