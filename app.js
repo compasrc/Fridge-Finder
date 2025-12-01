@@ -276,8 +276,7 @@ function openRecipeComments(recipe) {
     renderRecipeComments();
 }
 
-recipeCommentModalClose.onclick = () =>
-    recipeCommentModal.style.display = "none";
+recipeCommentModalClose.onclick = () => recipeCommentModal.style.display = "none";
 
 recipeCommentBtn.onclick = () => {
     const text = recipeCommentTextarea.value.trim();
