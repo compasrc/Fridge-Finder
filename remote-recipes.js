@@ -59,12 +59,26 @@ const RemoteRecipes = {
       }
     }
 
+    // Format instructions consistently
+    let instructions = meal.strInstructions || 'No instructions available.';
+    
+    // Split by common delimiters (newlines, periods followed by capital letters, or numbered steps)
+    const steps = instructions
+      .split(/\r?\n|(?<=[.!?])\s+(?=[A-Z])|(?:^|\s)(?:\d+\.|\d+\))\s*/)
+      .map(step => step.trim())
+      .filter(step => step.length > 10); // Filter out very short fragments
+    
+    // If we got multiple steps, format as numbered list, otherwise keep as paragraph
+    if (steps.length > 1) {
+      instructions = steps.map((step, i) => `${i + 1}. ${step}`).join('\n\n');
+    }
+
     return {
       id: meal.idMeal,
       name: meal.strMeal,
       ingredients: ingredients,
       ingredientsWithMeasures: ingredientsWithMeasures,
-      instructions: meal.strInstructions || 'No instructions available.',
+      instructions: instructions,
       source: 'themealdb'
     };
   },

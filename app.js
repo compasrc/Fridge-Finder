@@ -94,10 +94,13 @@ function renderRecipes(recipes) {
       ? recipe.ingredientsWithMeasures.map(ing => `• ${ing}`).join('<br>')
       : recipe.ingredients.map(ing => `• ${ing}`).join('<br>');
 
+    // Preserve newlines in instructions
+    const formattedInstructions = recipe.instructions.replace(/\n/g, '<br>');
+
     card.innerHTML = `
       <h3>${recipe.name}</h3>
       <p><strong>Ingredients:</strong><br>${ingredientsList}</p>
-      <p>${recipe.instructions}</p>
+      <p><strong>Instructions:</strong><br>${formattedInstructions}</p>
     `;
     card.appendChild(favButton);
     resultsDiv.appendChild(card);
@@ -156,10 +159,13 @@ function renderFavorites() {
       ? recipe.ingredientsWithMeasures.map(ing => `• ${ing}`).join('<br>')
       : recipe.ingredients.map(ing => `• ${ing}`).join('<br>');
     
+    // Preserve newlines in instructions
+    const formattedInstructions = recipe.instructions.replace(/\n/g, '<br>');
+    
     card.innerHTML = `
       <h3>${recipe.name}</h3>
       <p><strong>Ingredients:</strong><br>${ingredientsList}</p>
-      <p>${recipe.instructions}</p>
+      <p><strong>Instructions:</strong><br>${formattedInstructions}</p>
     `;
     card.appendChild(unfavButton);
     favoritesDiv.appendChild(card);
