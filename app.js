@@ -215,7 +215,8 @@ function getSelectedAllergens(){ return Array.from(document.querySelectorAll('.a
 // Recipe Filtering
 // -----------------
 function findRecipes(selectedIngredients,selectedAllergens){
-    if (selectedIngredients.length === 0 && selectedAllergens.length === 0) return allRecipes; // Return all if no filters applied
+    // Return all if no filters applied
+    if (selectedIngredients.length === 0 && selectedAllergens.length === 0) return allRecipes; 
 
     return allRecipes.filter(recipe=>{
         const recipeIngredients = recipe.ingredients.map(i=>i.toLowerCase());
@@ -225,9 +226,10 @@ function findRecipes(selectedIngredients,selectedAllergens){
             if(allergensMatch(recipeIngredients,allergen)) return false; 
         }
         
-        // 2. Inventory Matching Logic (Recipe ingredients must be subset of selected ingredients)
+        // 2. Inventory Matching Logic (Recipe must contain at least one selected ingredient)
         if (selectedIngredients.length > 0) {
-            return recipeIngredients.every(i => selectedIngredients.includes(i));
+            // FIX APPLIED HERE: Checks if AT LEAST ONE selected ingredient is in the recipe.
+            return selectedIngredients.some(i => recipeIngredients.includes(i));
         }
 
         // If no ingredients are selected, but an allergen filter was applied, the recipe passed the allergen filter
@@ -549,3 +551,4 @@ window.addEventListener('load',async()=>{
         showAuth();
     }
 });
+
