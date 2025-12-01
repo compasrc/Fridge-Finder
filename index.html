@@ -1,71 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FridgeFinder</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FridgeFinder</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1>FridgeFinder</h1>
+  <div class="container">
+    <h1>🍎 FridgeFinder 🔍</h1>
 
-    <!-- -----------------
-         Authentication Screen
-    ----------------- -->
-    <div id="authDiv" class="auth-section">
-      <h2>Sign In or Create Account</h2>
-      <input type="text" id="username" placeholder="Username">
-      <input type="password" id="password" placeholder="Password">
-      <div class="auth-buttons">
-        <button id="signInBtn">Sign In</button>
-        <button id="signUpBtn">Create Account</button>
-      </div>
-      <p id="authMessage" class="auth-message"></p>
-    </div>
+        <div id="authDiv" class="auth-section">
+      <h2>🚪 Sign In or Create Account</h2>
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+      <div class="auth-buttons">
+        <button id="signInBtn">🔑 Sign In</button>
+        <button id="signUpBtn">📝 Create Account</button>
+      </div>
+      <p id="authMessage" class="auth-message"></p>
+    </div>
 
-    <!-- -----------------
-         Main Site Content
-    ----------------- -->
-    <div id="mainContent" style="display:none;">
-      <div id="signOutDiv" class="signout-section">
-        <p>Signed in as <span id="displayUser"></span></p>
-        <button id="signOutBtn">Sign Out</button>
-      </div>
-
-      <h2>Select Ingredients</h2>
-      <div id="ingredients-container"></div>
-
-      <h2>Allergy Filters</h2>
-      <div class="allergy-filters">
-        <label><input type="checkbox" class="allergy-filter" value="gluten"> Gluten</label>
-        <label><input type="checkbox" class="allergy-filter" value="nuts"> Nuts</label>
-        <label><input type="checkbox" class="allergy-filter" value="dairy"> Dairy</label>
+        <div id="mainContent" style="display:none;">
+      <div id="signOutDiv" class="signout-section">
+        <p>Signed in as <strong id="displayUser"></strong></p>
+        <button id="signOutBtn">👋 Sign Out</button>
+      </div>
+      
+      <div class="tabs">
+          <button class="tab-button active" data-tab="search">🍳 Find Recipes</button>
+          <button class="tab-button" data-tab="plan">📅 Weekly Plan</button>
+          <button class="tab-button" data-tab="favorites">⭐ Favorites</button>
+          <button class="tab-button" data-tab="comments">💬 Community</button>
       </div>
 
-      <button id="search-btn">Find Recipes</button>
+            <div id="search" class="tab-content active">
+          <h2>🛒 Select Ingredients</h2>
+          <div id="ingredients-container"></div>
 
-      <div class="section">
-        <h2>Search Results</h2>
-        <div id="results"></div>
+          <h2>🚫 Allergy Filters</h2>
+          <div class="allergy-filters">
+            <label><input type="checkbox" class="allergy-filter" value="gluten"> 🌾 Gluten</label>
+            <label><input type="checkbox" class="allergy-filter" value="nuts"> 🥜 Nuts</label>
+            <label><input type="checkbox" class="allergy-filter" value="dairy"> 🥛 Dairy</label>
+          </div>
+
+          <button id="search-btn">🔍 Find Recipes</button>
+
+          <div class="section">
+            <h2>📊 Search Results</h2>
+            <div id="results"></div>
+          </div>
       </div>
 
-      <div class="section">
-        <h2>Favorites</h2>
-        <div id="favorites"></div>
-      </div>
+      <div id="plan" class="tab-content">
+        <h2>📅 Weekly Meal Plan</h2>
 
-      <div class="section">
-        <h2>Community Comments</h2>
-        <div id="commentSection">
-          <input type="text" id="commentInput" placeholder="Write a comment...">
-          <button id="postCommentBtn">Post Comment</button>
-          <div id="commentList"></div>
+        <div class="meal-plan-intro">
+            <p>Plan your meals for the week or let us suggest a random plan!</p>
+            <button id="suggestMealsBtn" class="suggest-btn">Suggest Random Meals</button>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <script src="app.js"></script>
+        <div id="weeklyPlan" class="weekly-plan"> 
+            </div>
+      </div>
+
+            <div id="favorites" class="tab-content">
+        <h2>⭐ My Favorites</h2>
+        <div id="favorites"></div>
+      </div>
+
+            <div id="comments" class="tab-content">
+        <h2>💬 Community Board</h2>
+        <div id="commentSection">
+          <input type="text" id="commentInput" placeholder="Share your thoughts with the community...">
+          <button id="postCommentBtn">📢 Post Comment</button>
+          <div id="commentList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
