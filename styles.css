@@ -1,320 +1,344 @@
 /* -----------------
-   Global Styles
+   GLOBAL STYLES
 ----------------- */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #FFFDF8;
-  color: #4B3832;
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #FFF8EB, #FFE6C3);
+    color: #6B4423;
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #FFF3E0;
+    border-radius: 20px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+h1, h2, h3 {
+    text-align: center;
+    color: #B8732E;
 }
 
 /* -----------------
-   Headings
------------------ */
-h1 {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #FF8C42;
-}
-
-h2 {
-  color: #6B4423;
-  margin-bottom: 10px;
-}
-
-/* -----------------
-   Auth Section
+   AUTH SECTION
 ----------------- */
 .auth-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
 .auth-section input {
-  padding: 8px;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 1px solid #B8732E;
-  width: 200px;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #B8732E;
+    width: 250px;
 }
 
 .auth-buttons {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 1rem;
 }
 
 .auth-buttons button {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background: #FFA347;
-  color: white;
-  font-weight: bold;
-  transition: background 0.2s;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #FFA347 0%, #FF8C42 100%);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
 .auth-buttons button:hover {
-  background: #FF8C42;
+    transform: scale(1.05);
 }
 
 .auth-message {
-  color: red;
-  font-weight: bold;
+    color: #B8732E;
+    font-style: italic;
 }
 
 /* -----------------
-   Tabs
+   TABS
 ----------------- */
 .tabs {
-  display: flex;
-  gap: 6px;
-  margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+    gap: 1rem;
 }
 
 .tab-button {
-  flex: 1;
-  padding: 8px 0;
-  border-radius: 8px;
-  border: 2px solid #FFA347;
-  background: #FFF8EB;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.2s, color 0.2s;
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 15px;
+    background-color: #FFE0B2;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .tab-button.active {
-  background: #FFA347;
-  color: white;
+    background: linear-gradient(135deg, #FFA347 0%, #FF8C42 100%);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
+.tab-button:hover:not(.active) {
+    background-color: #FFD59E;
+}
+
+/* -----------------
+   TAB CONTENT
+----------------- */
 .tab-content {
-  display: none;
+    display: none;
+    animation: fadeIn 0.3s ease-in;
 }
 
 .tab-content.active {
-  display: block;
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
 }
 
 /* -----------------
-   Ingredient Boxes
+   INGREDIENT BOXES
 ----------------- */
 #ingredients-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
 }
 
 .ingredient-box {
-  padding: 6px 10px;
-  border: 2px solid #FFA347;
-  border-radius: 8px;
-  cursor: pointer;
-  background: #FFF8EB;
-  transition: background 0.2s, transform 0.2s;
-  font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    background-color: #FFF1E0;
+    border: 1px solid #B8732E;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .ingredient-box:hover {
-  background: #FFD2A6;
-  transform: translateY(-2px);
+    background-color: #FFD59E;
 }
 
 .ingredient-box.selected {
-  background: #FFA347;
-  color: white;
+    background: linear-gradient(135deg, #FFA347 0%, #FF8C42 100%);
+    color: white;
 }
 
 /* -----------------
-   Recipe Cards
+   RECIPE CARDS
 ----------------- */
 .recipe-card {
-  border: 2px solid #B8732E;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 10px 0;
-  background: #FFF8EB;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    background-color: #FFF3E0;
+    border-radius: 15px;
+    padding: 1rem;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .recipe-card h3 {
-  margin: 0 0 6px;
-  font-size: 1.1rem;
-  color: #FF8C42;
+    margin: 0 0 0.5rem 0;
 }
 
 .recipe-card p {
-  margin: 4px 0;
-  font-size: 0.9rem;
+    margin: 0.3rem 0;
 }
 
 .recipe-card button {
-  margin: 4px 4px 0 0;
-  padding: 4px 8px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #FFA347;
-  color: white;
-  font-size: 0.85rem;
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
 }
 
-.recipe-card button:hover {
-  background: #FF8C42;
+.fav-btn {
+    background-color: #FFB74D;
+    color: #6B4423;
 }
 
-/* -----------------
-   Recipe Comments
------------------ */
-.recipe-comments {
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px dashed #B8732E;
+.fav-btn:hover {
+    background-color: #FFA347;
+    color: white;
 }
 
-.recipe-comment-input {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 6px;
+.comment-btn {
+    background-color: #FFD59E;
 }
 
-.recipe-comment-input input {
-  flex: 1;
-  padding: 4px 6px;
-  border-radius: 6px;
-  border: 1px solid #B8732E;
+.comment-btn:hover {
+    background-color: #FFB74D;
 }
 
-.recipe-comment {
-  margin-bottom: 4px;
-  font-size: 0.85rem;
+.add-to-plan-btn {
+    background-color: #FFE0B2;
+}
+
+.add-to-plan-btn:hover {
+    background-color: #FFD59E;
 }
 
 /* -----------------
-   Favorites
+   WEEKLY PLAN
 ----------------- */
-#favorites .recipe-card {
-  border-color: #FF8C42;
-}
-
-/* -----------------
-   Weekly Meal Plan
------------------ */
-#weeklyPlan {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  padding: 10px 0;
+.weekly-plan {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1rem 0;
 }
 
 .day-card {
-  flex: 1 1 120px;
-  min-width: 120px;
-  border: 2px solid #FFA347;
-  border-radius: 10px;
-  background: #FFF8EB;
-  padding: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
+    flex: 0 0 14%;
+    background-color: #FFF1E0;
+    border-radius: 15px;
+    padding: 0.7rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .day-card h3 {
-  text-align: center;
-  margin-bottom: 6px;
-  color: #6B4423;
-  font-size: 1rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: #B8732E;
 }
 
 .meal-slot {
-  margin: 4px 0;
-  padding: 6px;
-  border-top: 1px dashed #B8732E;
-  border-radius: 6px;
-  transition: background 0.2s, transform 0.2s;
-  cursor: default;
+    background-color: #FFE0B2;
+    border-radius: 10px;
+    padding: 0.3rem;
+    font-size: 0.85rem;
 }
 
-.meal-slot:hover {
-  background: #FFD2A6;
-  transform: translateY(-2px);
+.meal-slot.filled {
+    background-color: #FFA347;
+    color: white;
 }
 
 .meal-slot-header {
-  font-weight: bold;
-  font-size: 0.85rem;
-  margin-bottom: 2px;
-  color: #8B5E3C;
+    font-weight: bold;
+    margin-bottom: 0.2rem;
 }
 
 .meal-item {
-  font-size: 0.9rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Meal type emojis */
-.meal-slot-header::before {
-  content: attr(data-emoji) " ";
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .remove-meal {
-  color: #FF4B2B;
-  cursor: pointer;
-  font-weight: bold;
-  margin-left: 6px;
+    cursor: pointer;
+    color: #B8732E;
+    font-weight: bold;
 }
 
 .remove-meal:hover {
-  text-decoration: underline;
-}
-
-/* Responsive: make weekly plan scroll horizontally on small screens */
-@media (max-width: 900px) {
-  #weeklyPlan {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-  }
-  .day-card {
-    min-width: 150px;
-    flex: 0 0 auto;
-  }
-}
-
-/* Optional: subtle gradient for each day card */
-.day-card:nth-child(odd) {
-  background: linear-gradient(135deg, #FFF8EB 0%, #FFE5C4 100%);
-}
-
-.day-card:nth-child(even) {
-  background: linear-gradient(135deg, #FFF8EB 0%, #FFDAB3 100%);
+    color: #FF4500;
 }
 
 /* -----------------
-   Community Comments
+   COMMENTS
 ----------------- */
-#commentList .comment {
-  border-bottom: 1px dashed #B8732E;
-  padding: 4px 0;
-  font-size: 0.9rem;
+#commentSection input {
+    width: 80%;
+    padding: 0.5rem;
+    border-radius: 10px;
+    border: 1px solid #B8732E;
+    margin-right: 0.5rem;
 }
 
+#commentSection button {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #FFA347 0%, #FF8C42 100%);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.comment {
+    background-color: #FFF1E0;
+    padding: 0.5rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* -----------------
+   NO RESULTS
+----------------- */
 .no-results {
-  font-style: italic;
-  color: #B8732E;
-  text-align: center;
-  padding: 6px 0;
+    font-style: italic;
+    color: #B8732E;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/* -----------------
+   MODALS
+----------------- */
+.day-selector-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(107,68,35,0.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.day-selector-content {
+    background-color: #FFF3E0;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+    width: 90%;
+}
+
+.day-selector-content button {
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    background-color: #FFE0B2;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.day-selector-content button:hover {
+    background-color: #FFB74D;
+    color: white;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
 }
