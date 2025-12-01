@@ -22,7 +22,6 @@ const generalCommentTextarea = document.getElementById('general-comment-textarea
 const generalCommentBtn = document.getElementById('general-comment-btn');
 
 const weeklyPlanContainer = document.getElementById('weekly-plan-container');
-
 const planModal = document.getElementById('plan-modal');
 const planModalClose = document.getElementById('plan-modal-close');
 const planRecipeName = document.getElementById('plan-recipe-name');
@@ -41,138 +40,132 @@ const recipeCommentBtn = document.getElementById('recipe-comment-btn');
 // STATE
 // -----------------
 let allRecipes = [];
+let currentResults = [];
 let currentUser = null;
 let selectedRecipeForPlan = null;
 let selectedRecipeForComment = null;
 
 // -----------------
-// LOAD RECIPES
+// LOAD RECIPES JSON
 // -----------------
 async function loadRecipes() {
     try {
         const res = await fetch("data/recipes.json");
         allRecipes = await res.json();
+        console.log("Recipes loaded:", allRecipes.length);
     } catch (err) {
-        console.error("Failed to load recipes.json:", err);
+        console.error("Error loading recipes:", err);
     }
 }
-loadRecipes();
 
 // -----------------
 // LOCALSTORAGE HELPERS
 // -----------------
-function getUsers() { return JSON.parse(localStorage.getItem('users') || '{}'); }
-function saveUser(username, password) {
+const getUsers = () => JSON.parse(localStorage.getItem("users") || "{}");
+const saveUser = (u, p) => {
     const users = getUsers();
-    users[username] = password;
-    localStorage.setItem('users', JSON.stringify(users));
+    users[u] = p;
+    localStorage.setItem("users", JSON.stringify(users));
+};
+
+const getFavorites = (u) => JSON.parse(localStorage.getItem(`fav_${u}`) || "[]");
+const saveFavorites = (u, favs) => localStorage.setItem(`fav_${u}`, JSON.stringify(favs));
+
+const getGeneralComments = () => JSON.parse(localStorage.getItem("generalComments") || "[]");
+const saveGeneralComments = (c) => localStorage.setItem("generalComments", JSON.stringify(c));
+
+const getRecipeComments = (r) => JSON.parse(localStorage.getItem(`comments_${r}`) || "[]");
+const saveRecipeComments = (r, c) => localStorage.setItem(`comments_${r}`, JSON.stringify(c));
+
+function getMealPlan(u) {
+    const base = { Sunday:{}, Monday:{}, Tuesday:{}, Wednesday:{}, Thursday:{}, Friday:{}, Saturday:{} };
+    for (let d in base) base[d] = { breakfast:null, lunch:null, dinner:null };
+    return Object.assign(base, JSON.parse(localStorage.getItem(`meal_${u}`) || "{}"));
 }
-
-function getFavorites(username) { return JSON.parse(localStorage.getItem(`favorites_${username}`) || '[]'); }
-function saveFavorites(username, data) { localStorage.setItem(`favorites_${username}`, JSON.stringify(data)); }
-
-function getGeneralComments() { return JSON.parse(localStorage.getItem('generalComments') || '[]'); }
-function saveGeneralComments(c) { localStorage.setItem('generalComments', JSON.stringify(c)); }
-
-function getRecipeComments(name) { return JSON.parse(localStorage.getItem(`comments_${name}`) || '[]'); }
-function saveRecipeComments(name, data) { localStorage.setItem(`comments_${name}`, JSON.stringify(data)); }
-
-function getMealPlan(username) {
-    const key = `mealPlan_${username}`;
-    const base = {
-        Sunday: {}, Monday: {}, Tuesday: {}, Wednesday: {},
-        Thursday: {}, Friday: {}, Saturday: {}
-    };
-    ['breakfast','lunch','dinner'].forEach(meal => {
-        for (const day in base) base[day][meal] = null;
-    });
-    const existing = JSON.parse(localStorage.getItem(key) || '{}');
-    return Object.assign(base, existing);
-}
-function saveMealPlan(username, plan) {
-    localStorage.setItem(`mealPlan_${username}`, JSON.stringify(plan));
-}
+const saveMealPlan = (u, p) => localStorage.setItem(`meal_${u}`, JSON.stringify(p));
 
 // -----------------
-// AUTHENTICATION
+// AUTH
 // -----------------
-function showMainContent(username) {
+function showMainContent(user) {
     authDiv.style.display = "none";
     mainContent.style.display = "block";
-    displayUser.textContent = username;
-    currentUser = username;
-    localStorage.setItem("currentUser", username);
+    displayUser.textContent = user;
+    currentUser = user;
 
     renderFavorites();
     renderGeneralComments();
     renderWeeklyPlan();
-
     switchTab("search");
 }
 
 function showAuth() {
-    authDiv.style.display = "flex";
     mainContent.style.display = "none";
+    authDiv.style.display = "block";
     usernameInput.value = "";
     passwordInput.value = "";
     currentUser = null;
-    localStorage.removeItem("currentUser");
 }
 
+// SIGN IN
 signInBtn.addEventListener("click", () => {
-    const user = usernameInput.value.trim();
-    const pass = passwordInput.value;
+    const u = usernameInput.value.trim();
+    const p = passwordInput.value;
 
-    if (!user || !pass) {
-        authMessage.textContent = "Please enter both fields.";
+    if (!u || !p) {
+        authMessage.textContent = "Enter username and password.";
         authMessage.style.color = "red";
         return;
     }
 
     const users = getUsers();
-    if (!users[user] || users[user] !== pass) {
+    if (!users[u] || users[u] !== p) {
         authMessage.textContent = "Incorrect username or password.";
         authMessage.style.color = "red";
         return;
     }
 
     authMessage.textContent = "";
-    showMainContent(user);
+    showMainContent(u);
 });
 
+// SIGN UP
 signUpBtn.addEventListener("click", () => {
-    const user = usernameInput.value.trim();
-    const pass = passwordInput.value;
+    const u = usernameInput.value.trim();
+    const p = passwordInput.value;
 
-    if (!user || !pass) {
-        authMessage.textContent = "Please enter both fields.";
+    if (!u || !p) {
+        authMessage.textContent = "Enter username and password.";
         authMessage.style.color = "red";
         return;
     }
 
     const users = getUsers();
-    if (users[user]) {
-        authMessage.textContent = "Username already taken.";
+    if (users[u]) {
+        authMessage.textContent = "Username already exists.";
         authMessage.style.color = "red";
         return;
     }
 
-    saveUser(user, pass);
-    authMessage.textContent = "Account created! You can sign in.";
+    saveUser(u, p);
+    authMessage.textContent = "Account created!";
     authMessage.style.color = "green";
 });
 
+// SIGN OUT
 signOutBtn.addEventListener("click", showAuth);
 
 // -----------------
-// TAB SWITCHING
+// TABS
 // -----------------
 function switchTab(tabId) {
-    tabContents.forEach(tab => tab.style.display = "none");
-    tabButtons.forEach(btn => btn.classList.remove("active"));
+    tabContents.forEach(t => t.style.display = "none");
     document.getElementById(tabId).style.display = "block";
+
+    tabButtons.forEach(b => b.classList.remove("active"));
     document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add("active");
 }
+
 tabButtons.forEach(btn =>
     btn.addEventListener("click", () => switchTab(btn.dataset.tab))
 );
@@ -181,59 +174,53 @@ tabButtons.forEach(btn =>
 // SEARCH
 // -----------------
 searchBtn.addEventListener("click", () => {
-    resultsDiv.innerHTML = "";
-    allRecipes.forEach(recipe => {
-        const card = document.createElement("div");
-        card.className = "recipe-card";
-        card.innerHTML = `
-            <h3>${recipe.name}</h3>
-            <button class="btn small" data-fav="${recipe.name}">⭐ Favorite</button>
-            <button class="btn small" data-plan="${recipe.name}">📅 Plan</button>
-            <button class="btn small" data-comment="${recipe.name}">💬 Comments</button>
-        `;
-        resultsDiv.appendChild(card);
-    });
-
-    // Favorite button
-    document.querySelectorAll("[data-fav]").forEach(btn =>
-        btn.addEventListener("click", () => addFavorite(btn.dataset.fav))
-    );
-
-    // Plan modal
-    document.querySelectorAll("[data-plan]").forEach(btn =>
-        btn.addEventListener("click", () => openPlanModal(btn.dataset.plan))
-    );
-
-    // Comment modal
-    document.querySelectorAll("[data-comment]").forEach(btn =>
-        btn.addEventListener("click", () => openCommentModal(btn.dataset.comment))
-    );
+    currentResults = allRecipes;
+    renderResults();
 });
+
+function renderResults() {
+    resultsDiv.innerHTML = "";
+
+    currentResults.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "recipe-card";
+        div.innerHTML = `
+            <h3>${r.name}</h3>
+            <button class="btn fav-btn">⭐</button>
+            <button class="btn plan-btn">📅 Plan</button>
+            <button class="btn comment-btn">💬 Comments</button>
+        `;
+
+        div.querySelector(".fav-btn").onclick = () => toggleFavorite(r.name);
+        div.querySelector(".plan-btn").onclick = () => openPlanModal(r.name);
+        div.querySelector(".comment-btn").onclick = () => openRecipeComments(r.name);
+
+        resultsDiv.appendChild(div);
+    });
+}
 
 // -----------------
 // FAVORITES
 // -----------------
-function addFavorite(name) {
-    const favs = getFavorites(currentUser);
-    if (!favs.includes(name)) favs.push(name);
+function toggleFavorite(name) {
+    let favs = getFavorites(currentUser);
+
+    if (favs.includes(name)) favs = favs.filter(f => f !== name);
+    else favs.push(name);
+
     saveFavorites(currentUser, favs);
     renderFavorites();
 }
 
 function renderFavorites() {
-    const list = document.getElementById("favorites-list");
-    list.innerHTML = "";
-    const favs = getFavorites(currentUser);
-    if (favs.length === 0) {
-        list.innerHTML = "<p>No favorites yet.</p>";
-        return;
-    }
+    const favDiv = document.getElementById("favorites-list");
+    favDiv.innerHTML = "";
 
-    favs.forEach(name => {
+    getFavorites(currentUser).forEach(f => {
         const div = document.createElement("div");
-        div.className = "favorite-item";
-        div.textContent = "⭐ " + name;
-        list.appendChild(div);
+        div.className = "favorite";
+        div.innerHTML = `<p>${f}</p>`;
+        favDiv.appendChild(div);
     });
 }
 
@@ -253,11 +240,11 @@ generalCommentBtn.addEventListener("click", () => {
 });
 
 function renderGeneralComments() {
-    const comments = getGeneralComments();
     generalCommentsContainer.innerHTML = "";
-    comments.forEach(c => {
+
+    getGeneralComments().forEach(c => {
         const div = document.createElement("div");
-        div.className = "comment-box";
+        div.className = "comment";
         div.innerHTML = `<strong>${c.user}:</strong> ${c.text}`;
         generalCommentsContainer.appendChild(div);
     });
@@ -266,74 +253,87 @@ function renderGeneralComments() {
 // -----------------
 // WEEKLY PLAN
 // -----------------
-function openPlanModal(recipeName) {
-    selectedRecipeForPlan = recipeName;
-    planRecipeName.textContent = recipeName;
+function openPlanModal(recipe) {
+    selectedRecipeForPlan = recipe;
+    planRecipeName.textContent = recipe;
     planModal.style.display = "block";
 }
 
-planModalClose.onclick = () => (planModal.style.display = "none");
+planModalClose.onclick = () => planModal.style.display = "none";
 
-planConfirmBtn.addEventListener("click", () => {
+planConfirmBtn.onclick = () => {
+    if (!currentUser) return;
+
+    const plan = getMealPlan(currentUser);
     const day = planDaySelect.value;
     const meal = planMealSelect.value;
 
-    const plan = getMealPlan(currentUser);
     plan[day][meal] = selectedRecipeForPlan;
-
     saveMealPlan(currentUser, plan);
-    renderWeeklyPlan();
 
     planModal.style.display = "none";
-});
+    renderWeeklyPlan();
+};
 
 function renderWeeklyPlan() {
     const plan = getMealPlan(currentUser);
     weeklyPlanContainer.innerHTML = "";
 
-    Object.keys(plan).forEach(day => {
+    for (let day in plan) {
         const div = document.createElement("div");
-        div.className = "day-box";
-        div.innerHTML = `<h3>${day}</h3>
+        div.className = "day-plan";
+
+        div.innerHTML = `
+            <h3>${day}</h3>
             <p>Breakfast: ${plan[day].breakfast || "-"}</p>
             <p>Lunch: ${plan[day].lunch || "-"}</p>
-            <p>Dinner: ${plan[day].dinner || "-"}</p>`;
+            <p>Dinner: ${plan[day].dinner || "-"}</p>
+        `;
+
         weeklyPlanContainer.appendChild(div);
-    });
+    }
 }
 
 // -----------------
-// RECIPE COMMENT MODAL
+// RECIPE COMMENTS
 // -----------------
-function openCommentModal(recipeName) {
-    selectedRecipeForComment = recipeName;
-    commentRecipeName.textContent = recipeName;
-    renderRecipeComments();
+function openRecipeComments(recipe) {
+    selectedRecipeForComment = recipe;
+    commentRecipeName.textContent = recipe;
+
     recipeCommentModal.style.display = "block";
+    renderRecipeComments();
 }
 
-recipeCommentModalClose.onclick = () => (recipeCommentModal.style.display = "none");
+recipeCommentModalClose.onclick = () =>
+    recipeCommentModal.style.display = "none";
 
-recipeCommentBtn.addEventListener("click", () => {
+recipeCommentBtn.onclick = () => {
     const text = recipeCommentTextarea.value.trim();
     if (!text) return;
 
     const comments = getRecipeComments(selectedRecipeForComment);
     comments.push({ user: currentUser, text });
-    saveRecipeComments(selectedRecipeForComment, comments);
 
+    saveRecipeComments(selectedRecipeForComment, comments);
     recipeCommentTextarea.value = "";
+
     renderRecipeComments();
-});
+};
 
 function renderRecipeComments() {
-    const comments = getRecipeComments(selectedRecipeForComment);
     recipeCommentsList.innerHTML = "";
+    const comments = getRecipeComments(selectedRecipeForComment);
 
     comments.forEach(c => {
         const div = document.createElement("div");
-        div.className = "comment-box";
+        div.className = "comment";
         div.innerHTML = `<strong>${c.user}:</strong> ${c.text}`;
         recipeCommentsList.appendChild(div);
     });
 }
+
+// -----------------
+// INITIALIZE
+// -----------------
+loadRecipes();
