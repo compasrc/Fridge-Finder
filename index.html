@@ -30,6 +30,13 @@
 
     <div class="section">
       <h2>Select Your Ingredients</h2>
+      <div class="data-source-toggle">
+        <label>
+          <input type="checkbox" id="use-remote-recipes">
+          Use TheMealDB (remote recipes)
+        </label>
+        <button id="refresh-remote-btn" style="margin-left: 10px;" disabled>Refresh remote data</button>
+      </div>
       <div id="ingredients-container"></div>
       <button id="search-btn">Find Recipes</button>
     </div>
