@@ -1,26 +1,10 @@
 // -----------------
 // Helper Functions
 // -----------------
-let useRemoteRecipes = false;
 
 async function loadRecipes() {
-  if (useRemoteRecipes) {
-    console.log('Loading recipes from TheMealDB...');
-    return await RemoteRecipes.loadDiverseRecipes();
-  }
-  
-  // Load local recipes
-  try {
-    const res = await fetch("data/recipes.json");
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    return await res.json();
-  } catch (error) {
-    console.error("Error loading recipes:", error);
-    alert("Failed to load recipes. Please check that data/recipes.json exists.");
-    return [];
-  }
+  console.log('Loading recipes from TheMealDB...');
+  return await RemoteRecipes.loadDiverseRecipes();
 }
 
 function getAllIngredients(recipes) {
@@ -57,20 +41,6 @@ function getSelectedIngredients() {
 function getSelectedAllergens() {
   return Array.from(document.querySelectorAll(".allergy-filter:checked"))
               .map(box => box.value.toLowerCase());
-}
-
-// Emoji mapping for ingredients
-function getIngredientEmoji(ingredient) {
-  const mapping = {
-    "bread": "🥖", "pasta": "🍝", "cheese": "🧀", "milk": "🥛",
-    "nuts": "🌰", "eggs": "🥚", "butter": "🧈", "avocado": "🥑",
-    "tomato": "🍅", "banana": "🍌", "strawberry": "🍓",
-    "lettuce": "🥬", "rice": "🍚", "peanut butter": "🥜",
-    "jelly": "🍇", "naan": "🍞", "soy sauce": "🧂", "olive oil": "🫒",
-    "salt": "🧂", "tomato sauce": "🍅"
-  };
-  for (const key in mapping) if (ingredient.includes(key)) return mapping[key];
-  return "";
 }
 
 // -----------------
@@ -114,16 +84,19 @@ function renderRecipes(recipes) {
     const card = document.createElement("div");
     card.className = "recipe-card";
 
-    const emojis = recipe.ingredients.map(getIngredientEmoji).filter(Boolean).join(" ");
-
     const favButton = document.createElement("button");
     favButton.textContent = localStorage.getItem(recipe.name) ? "★ Favorited" : "☆ Favorite";
     favButton.className = "fav-btn";
     favButton.addEventListener("click", () => toggleFavorite(recipe));
 
+    // Format ingredients with line breaks
+    const ingredientsList = recipe.ingredientsWithMeasures 
+      ? recipe.ingredientsWithMeasures.map(ing => `• ${ing}`).join('<br>')
+      : recipe.ingredients.map(ing => `• ${ing}`).join('<br>');
+
     card.innerHTML = `
-      <h3>${emojis} ${recipe.name}</h3>
-      <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
+      <h3>${recipe.name}</h3>
+      <p><strong>Ingredients:</strong><br>${ingredientsList}</p>
       <p>${recipe.instructions}</p>
     `;
     card.appendChild(favButton);
@@ -168,7 +141,6 @@ function renderFavorites() {
   favoriteRecipes.forEach(recipe => {
     const card = document.createElement("div");
     card.className = "recipe-card";
-    const emojis = recipe.ingredients.map(getIngredientEmoji).filter(Boolean).join(" ");
     
     const unfavButton = document.createElement("button");
     unfavButton.textContent = "★ Remove";
@@ -179,9 +151,14 @@ function renderFavorites() {
       if (currentResults.length > 0) renderRecipes(currentResults);
     });
     
+    // Format ingredients with line breaks
+    const ingredientsList = recipe.ingredientsWithMeasures 
+      ? recipe.ingredientsWithMeasures.map(ing => `• ${ing}`).join('<br>')
+      : recipe.ingredients.map(ing => `• ${ing}`).join('<br>');
+    
     card.innerHTML = `
-      <h3>${emojis} ${recipe.name}</h3>
-      <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
+      <h3>${recipe.name}</h3>
+      <p><strong>Ingredients:</strong><br>${ingredientsList}</p>
       <p>${recipe.instructions}</p>
     `;
     card.appendChild(unfavButton);
@@ -210,28 +187,12 @@ async function initializeApp() {
 }
 
 function setupDataSourceToggle() {
-  const checkbox = document.getElementById('use-remote-recipes');
   const refreshBtn = document.getElementById('refresh-remote-btn');
   const selectAllBtn = document.getElementById('select-all-btn');
   
-  checkbox.addEventListener('change', async (e) => {
-    useRemoteRecipes = e.target.checked;
-    refreshBtn.disabled = !useRemoteRecipes;
-    
-    console.log(`Switching to ${useRemoteRecipes ? 'remote' : 'local'} recipes...`);
-    allRecipes = await loadRecipes();
-    
-    const allIngredients = getAllIngredients(allRecipes);
-    createIngredientBoxes(allIngredients);
-    
-    // Clear search results when switching
-    currentResults = [];
-    document.getElementById('results').innerHTML = '';
-  });
+  refreshBtn.disabled = false;
   
   refreshBtn.addEventListener('click', async () => {
-    if (!useRemoteRecipes) return;
-    
     console.log('Refreshing remote recipes...');
     refreshBtn.disabled = true;
     refreshBtn.textContent = 'Loading...';

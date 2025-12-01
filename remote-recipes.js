@@ -41,12 +41,21 @@ const RemoteRecipes = {
   // Normalize TheMealDB recipe to our format
   normalizeRecipe(meal) {
     const ingredients = [];
+    const ingredientsWithMeasures = [];
     
     // TheMealDB has ingredients in strIngredient1-20 format
     for (let i = 1; i <= 20; i++) {
       const ingredient = meal[`strIngredient${i}`];
+      const measure = meal[`strMeasure${i}`];
+      
       if (ingredient && ingredient.trim()) {
         ingredients.push(ingredient.toLowerCase().trim());
+        
+        // Combine measure and ingredient for display
+        const measureText = measure && measure.trim() ? measure.trim() : '';
+        ingredientsWithMeasures.push(
+          measureText ? `${measureText} ${ingredient.trim()}` : ingredient.trim()
+        );
       }
     }
 
@@ -54,6 +63,7 @@ const RemoteRecipes = {
       id: meal.idMeal,
       name: meal.strMeal,
       ingredients: ingredients,
+      ingredientsWithMeasures: ingredientsWithMeasures,
       instructions: meal.strInstructions || 'No instructions available.',
       source: 'themealdb'
     };
