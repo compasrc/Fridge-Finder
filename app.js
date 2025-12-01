@@ -1,51 +1,24 @@
 // -----------------
-// DOM Elements
+// app.js (complete, robust)
 // -----------------
-const authDiv = document.getElementById('authDiv');
-const mainContent = document.getElementById('mainContent');
-const signInBtn = document.getElementById('signInBtn');
-const signUpBtn = document.getElementById('signUpBtn');
-const signOutBtn = document.getElementById('signOutBtn');
-const displayUser = document.getElementById('displayUser');
-const authMessage = document.getElementById('authMessage');
-const usernameInput = document.getElementById('username');
-const passwordInput = document.getElementById('password');
 
-// Tab elements
-const tabButtons = document.querySelectorAll('.tab-button');
-const tabContents = document.querySelectorAll('.tab-content');
+// DOM helpers (safe getElement)
+function $id(id) { return document.getElementById(id); }
+function $qs(sel) { return document.querySelector(sel); }
+function $qsa(sel) { return Array.from(document.querySelectorAll(sel)); }
 
-// Search elements
-const searchBtn = document.getElementById('search-btn');
-const resultsDiv = document.getElementById('results');
-const ingredientsInput = document.getElementById('ingredients-input');
+// -----------------
+// DOM Elements (grab after DOMContentLoaded to be safe)
+// -----------------
+let authDiv, mainContent, signInBtn, signUpBtn, signOutBtn, displayUser, authMessage, usernameInput, passwordInput;
+let tabButtons, tabContents;
+let searchBtn, resultsDiv, ingredientsContainer;
+let generalCommentsContainer, generalCommentTextarea, generalCommentBtn;
+let weeklyPlanContainer, planModal, planModalClose, planRecipeName, planDaySelect, planMealSelect, planConfirmBtn;
+let recipeCommentModal, recipeCommentModalClose, commentRecipeName, recipeCommentsList, recipeCommentTextarea, recipeCommentBtn;
+let allergyCheckboxes;
 
-// Ingredients display container
-const ingredientsContainer = document.getElementById('ingredients-container');
-
-// General Comments elements
-const generalCommentsContainer = document.getElementById('general-comments-container');
-const generalCommentTextarea = document.getElementById('general-comment-textarea');
-const generalCommentBtn = document.getElementById('general-comment-btn');
-
-// Weekly Plan elements
-const weeklyPlanContainer = document.getElementById('weekly-plan-container');
-const planModal = document.getElementById('plan-modal');
-const planModalClose = document.getElementById('plan-modal-close');
-const planRecipeName = document.getElementById('plan-recipe-name');
-const planDaySelect = document.getElementById('plan-day-select');
-const planMealSelect = document.getElementById('plan-meal-select');
-const planConfirmBtn = document.getElementById('plan-confirm-btn');
-
-// Recipe Comments Modal elements
-const recipeCommentModal = document.getElementById('recipe-comment-modal');
-const recipeCommentModalClose = document.getElementById('recipe-comment-modal-close');
-const commentRecipeName = document.getElementById('comment-recipe-name');
-const recipeCommentsList = document.getElementById('recipe-comments-list');
-const recipeCommentTextarea = document.getElementById('recipe-comment-textarea');
-const recipeCommentBtn = document.getElementById('recipe-comment-btn');
-
-// State Variables
+// State
 let allRecipes = [];
 let currentResults = [];
 let currentUser = null;
@@ -53,47 +26,62 @@ let selectedRecipeForPlan = null;
 let selectedRecipeForComment = null;
 
 // -----------------
-// Load Recipes JSON
+// Utility: safe query/get - used to avoid null errors
+// -----------------
+function ensureElement(el, id) {
+    if (!el) console.warn(`Missing element with id/select: ${id}`);
+    return el;
+}
+
+// -----------------
+// Load recipes from JSON
 // -----------------
 async function loadRecipes() {
     try {
         const res = await fetch('data/recipes.json');
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         allRecipes = await res.json();
-
         console.log('Recipes loaded:', allRecipes.length);
         populateIngredientList();
-
     } catch (err) {
         console.error('Failed to load recipes.json:', err);
-        ingredientsContainer.innerHTML =
-            `<div class="no-results">Error loading recipes: ${err.message}</div>`;
+        if (ingredientsContainer) {
+            ingredientsContainer.innerHTML = `<div class="no-results">Error loading recipes: ${err.message}</div>`;
+        }
     }
 }
 
 // -----------------
-// Populate ingredient list dynamically
+// Populate ingredients checkboxes
 // -----------------
-function populateIngredientList() {
-    const ingredientSet = new Set();
-
+function getAllIngredients() {
+    const s = new Set();
     allRecipes.forEach(r => {
-        r.ingredients.forEach(i => ingredientSet.add(i));
+        if (Array.isArray(r.ingredients)) r.ingredients.forEach(i => s.add(String(i).toLowerCase()));
     });
+    return [...s].sort();
+}
 
-    const sorted = [...ingredientSet].sort();
+function populateIngredientList() {
+    if (!ingredientsContainer) return;
+    const ingredients = getAllIngredients();
+    if (!ingredients.length) {
+        ingredientsContainer.innerHTML = `<div class="no-results">No ingredients found.</div>`;
+        return;
+    }
 
-    ingredientsContainer.innerHTML =
-        sorted.map(ing => `
-            <label class="ingredient-option">
-                <input type="checkbox" class="ingredient-checkbox" value="${ing}">
-                ${ing}
-            </label>
-        `).join('');
+    ingredientsContainer.innerHTML = ingredients.map(ing => `
+        <label class="ingredient-option" title="Filter by ${ing}">
+            <input type="checkbox" class="ingredient-checkbox" value="${ing}">
+            ${ing}
+        </label>
+    `).join('');
+    // refresh allergyCheckboxes reference (if needed)
+    allergyCheckboxes = $qsa('.allergy-filter');
 }
 
 // -----------------
-// LocalStorage Helpers
+// LocalStorage helpers
 // -----------------
 function getUsers() { return JSON.parse(localStorage.getItem('users') || '{}'); }
 function saveUser(username, password) {
@@ -101,55 +89,41 @@ function saveUser(username, password) {
     users[username] = password;
     localStorage.setItem('users', JSON.stringify(users));
 }
-
 function getFavorites(username) { return JSON.parse(localStorage.getItem(`favorites_${username}`) || '[]'); }
-function saveFavorites(username, favorites) {
-    localStorage.setItem(`favorites_${username}`, JSON.stringify(favorites));
-}
-
+function saveFavorites(username, favs) { localStorage.setItem(`favorites_${username}`, JSON.stringify(favs)); }
 function getRecipeComments(recipeName) { return JSON.parse(localStorage.getItem(`comments_${recipeName}`) || '[]'); }
-function saveRecipeComments(recipeName, comments) {
-    localStorage.setItem(`comments_${recipeName}`, JSON.stringify(comments));
-}
-
+function saveRecipeComments(recipeName, comments) { localStorage.setItem(`comments_${recipeName}`, JSON.stringify(comments)); }
 function getGeneralComments() { return JSON.parse(localStorage.getItem('generalComments') || '[]'); }
-function saveGeneralComments(comments) {
-    localStorage.setItem('generalComments', JSON.stringify(comments));
-}
+function saveGeneralComments(comments) { localStorage.setItem('generalComments', JSON.stringify(comments)); }
 
 function getMealPlan(username) {
     const key = `mealPlan_${username}`;
+    // default structure
     const defaultPlan = {
-        Sunday: {}, Monday: {}, Tuesday: {}, Wednesday: {},
-        Thursday: {}, Friday: {}, Saturday: {}
+        Sunday: { breakfast: null, lunch: null, dinner: null },
+        Monday: { breakfast: null, lunch: null, dinner: null },
+        Tuesday: { breakfast: null, lunch: null, dinner: null },
+        Wednesday: { breakfast: null, lunch: null, dinner: null },
+        Thursday: { breakfast: null, lunch: null, dinner: null },
+        Friday: { breakfast: null, lunch: null, dinner: null },
+        Saturday: { breakfast: null, lunch: null, dinner: null }
     };
-
-    ['breakfast', 'lunch', 'dinner'].forEach(meal => {
-        Object.keys(defaultPlan).forEach(day => defaultPlan[day][meal] = null);
+    const stored = JSON.parse(localStorage.getItem(key) || '{}');
+    // merge
+    Object.keys(defaultPlan).forEach(day => {
+        defaultPlan[day] = { ...defaultPlan[day], ...(stored[day] || {}) };
     });
-
-    const storedPlan = JSON.parse(localStorage.getItem(key) || '{}');
-    const plan = { ...defaultPlan };
-
-    for (const day in storedPlan) {
-        if (plan[day]) {
-            plan[day] = { ...plan[day], ...storedPlan[day] };
-        }
-    }
-    return plan;
+    return defaultPlan;
 }
-
-function saveMealPlan(username, mealPlan) {
-    localStorage.setItem(`mealPlan_${username}`, JSON.stringify(mealPlan));
-}
+function saveMealPlan(username, plan) { localStorage.setItem(`mealPlan_${username}`, JSON.stringify(plan)); }
 
 // -----------------
-// Authentication Logic
+// Authentication UI
 // -----------------
 function showMainContent(username) {
-    authDiv.style.display = 'none';
-    mainContent.style.display = 'block';
-    displayUser.textContent = username;
+    if (authDiv) authDiv.style.display = 'none';
+    if (mainContent) mainContent.style.display = 'block';
+    if (displayUser) displayUser.textContent = username;
     currentUser = username;
     localStorage.setItem('currentUser', username);
 
@@ -161,250 +135,238 @@ function showMainContent(username) {
 }
 
 function showAuth() {
-    authDiv.style.display = 'flex';
-    mainContent.style.display = 'none';
-    usernameInput.value = '';
-    passwordInput.value = '';
+    if (authDiv) authDiv.style.display = 'flex';
+    if (mainContent) mainContent.style.display = 'none';
+    if (usernameInput) usernameInput.value = '';
+    if (passwordInput) passwordInput.value = '';
     currentUser = null;
     localStorage.removeItem('currentUser');
-
-    resultsDiv.innerHTML = '';
-    document.getElementById('favorites-list').innerHTML = '';
+    if (resultsDiv) resultsDiv.innerHTML = '';
+    const favList = $id('favorites-list');
+    if (favList) favList.innerHTML = '';
 }
 
 // -----------------
-// Attach Auth Events
-// -----------------
-signInBtn.addEventListener('click', () => {
-    const user = usernameInput.value.trim();
-    const pass = passwordInput.value.trim();
-    const users = getUsers();
-
-    if (users[user] && users[user] === pass) {
-        authMessage.textContent = '';
-        showMainContent(user);
-    } else {
-        authMessage.textContent = 'Invalid username or password.';
-    }
-});
-
-signUpBtn.addEventListener('click', () => {
-    const user = usernameInput.value.trim();
-    const pass = passwordInput.value.trim();
-    const users = getUsers();
-
-    if (!user || !pass) {
-        authMessage.textContent = 'Enter username and password.';
-        return;
-    }
-
-    if (users[user]) {
-        authMessage.textContent = 'Username already exists.';
-        return;
-    }
-
-    saveUser(user, pass);
-    authMessage.textContent = 'Account created. You may sign in.';
-});
-
-signOutBtn.addEventListener('click', showAuth);
-
-// -----------------
-// Tab Switching
+// Tab switching (defensive)
 // -----------------
 function switchTab(tabId) {
-    tabContents.forEach(c => c.style.display = 'none');
-    tabButtons.forEach(b => b.classList.remove('active'));
+    // hide all tabContents safely
+    if (tabContents && tabContents.length) {
+        tabContents.forEach(c => {
+            if (c && c.style) c.style.display = 'none';
+        });
+    } else {
+        // try fallback by class name
+        $qsa('.tab-content').forEach(c => c.style.display = 'none');
+    }
 
-    document.getElementById(`${tabId}-tab`).style.display = 'block';
-    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+    // remove active from buttons
+    if (tabButtons && tabButtons.length) {
+        tabButtons.forEach(b => b.classList.remove('active'));
+    } else {
+        $qsa('.tab-button').forEach(b => b.classList.remove('active'));
+    }
+
+    // show requested content
+    const content = $id(tabId);
+    if (content && content.style) {
+        content.style.display = 'block';
+    } else {
+        console.warn(`switchTab: content #${tabId} not found`);
+    }
+
+    // set active button
+    const btn = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+    if (btn) btn.classList.add('active');
+
+    // call renderers for specific tabs if needed
+    if (tabId === 'favorites') renderFavorites();
+    if (tabId === 'plan') renderWeeklyPlan();
+    if (tabId === 'general-comments') renderGeneralComments();
 }
 
-tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
-
 // -----------------
-// SEARCH FUNCTIONALITY
+// Search logic
 // -----------------
-searchBtn.addEventListener('click', () => {
-    const checked = [...document.querySelectorAll('.ingredient-checkbox:checked')]
-        .map(i => i.value.toLowerCase());
+function getSelectedIngredients() {
+    return $qsa('.ingredient-checkbox:checked').map(ch => ch.value.toLowerCase());
+}
+function getSelectedAllergens() {
+    return $qsa('.allergy-filter:checked').map(ch => ch.value.toLowerCase());
+}
 
-    if (checked.length === 0) {
-        resultsDiv.innerHTML = '<div class="no-results">Select at least one ingredient.</div>';
-        return;
+function allergensMatch(recipeIngredients, allergen) {
+    if (!Array.isArray(recipeIngredients)) return false;
+    if (allergen === 'gluten') return recipeIngredients.some(i => /bread|pasta|naan|flour|oats/i.test(i));
+    if (allergen === 'nuts') return recipeIngredients.some(i => /nut|peanut|almond|pecan|walnut/i.test(i));
+    if (allergen === 'dairy') return recipeIngredients.some(i => /cheese|milk|butter|cream|yogurt|mayonnaise/i.test(i));
+    return false;
+}
+
+function findRecipes(selectedIngredients, selectedAllergens) {
+    // if no filters, return all
+    if ((!selectedIngredients || selectedIngredients.length === 0) && (!selectedAllergens || selectedAllergens.length === 0)) {
+        return allRecipes.slice();
     }
 
-    currentResults = allRecipes.filter(recipe =>
-        checked.every(q =>
-            recipe.ingredients.some(ing => ing.toLowerCase().includes(q))
-        )
-    );
+    return allRecipes.filter(recipe => {
+        const rIngredients = (recipe.ingredients || []).map(i => String(i).toLowerCase());
 
-    if (currentResults.length === 0) {
-        resultsDiv.innerHTML = '<div class="no-results">No matching recipes found.</div>';
-        return;
-    }
+        // allergen check
+        for (const a of selectedAllergens) {
+            if (allergensMatch(rIngredients, a)) return false;
+        }
 
-    renderResults(currentResults);
-});
+        // if ingredients selected: require recipe contains every selected ingredient (subset)
+        if (selectedIngredients && selectedIngredients.length > 0) {
+            return selectedIngredients.every(si => rIngredients.some(ri => ri.includes(si)));
+        }
 
+        // otherwise passed allergen filter
+        return true;
+    });
+}
+
+// -----------------
+// Rendering
+// -----------------
 function renderResults(recipes) {
-    resultsDiv.innerHTML = recipes.map(recipe => `
-        <div class="recipe-card">
-            <h3>${recipe.name}</h3>
-            <p><strong>Ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
+    if (!resultsDiv) return;
+    if (!recipes || recipes.length === 0) {
+        resultsDiv.innerHTML = `<div class="no-results">No recipes found. Try different ingredients.</div>`;
+        return;
+    }
 
-            <button class="favorite-btn" data-name="${recipe.name}">Add to Favorites</button>
-            <button class="comment-btn" data-name="${recipe.name}">Comments</button>
-            <button class="add-to-plan-btn" data-name="${recipe.name}">Add to Weekly Plan</button>
+    resultsDiv.innerHTML = recipes.map(r => `
+        <div class="recipe-card" data-recipe="${escapeHtml(r.name)}">
+            <h3>${escapeHtml(r.name)}</h3>
+            <p><strong>Ingredients:</strong> ${r.ingredients.join(', ')}</p>
+            <p><strong>Time:</strong> ${r.prep_time_min ?? 'N/A'} min prep, ${r.cook_time_min ?? 'N/A'} min cook</p>
+            <div class="recipe-actions">
+                <button class="fav-action btn" data-name="${escapeAttr(r.name)}">❤ Favorite</button>
+                <button class="plan-action btn" data-name="${escapeAttr(r.name)}">📅 Add to Plan</button>
+                <button class="comment-open btn" data-name="${escapeAttr(r.name)}">💬 Comments</button>
+            </div>
         </div>
     `).join('');
 
-    attachRecipeButtons();
+    // attach listeners
+    $qsa('.fav-action').forEach(b => b.addEventListener('click', (e) => {
+        const name = e.currentTarget.dataset.name;
+        toggleFavorite(name);
+    }));
+    $qsa('.plan-action').forEach(b => b.addEventListener('click', (e) => {
+        const name = e.currentTarget.dataset.name;
+        openPlanModal(name);
+    }));
+    $qsa('.comment-open').forEach(b => b.addEventListener('click', (e) => {
+        const name = e.currentTarget.dataset.name;
+        openCommentModal(name);
+    }));
 }
 
-function attachRecipeButtons() {
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-        btn.addEventListener('click', () => addFavorite(btn.dataset.name));
-    });
-
-    document.querySelectorAll('.comment-btn').forEach(btn => {
-        btn.addEventListener('click', () => openRecipeComments(btn.dataset.name));
-    });
-
-    document.querySelectorAll('.add-to-plan-btn').forEach(btn => {
-        btn.addEventListener('click', () => openPlanModal(btn.dataset.name));
-    });
+function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[s]));
 }
+function escapeAttr(str){ return String(str).replace(/"/g, '&quot;'); }
 
 // -----------------
-// FAVORITES
+// Favorites
 // -----------------
-function addFavorite(recipeName) {
+function toggleFavorite(recipeName) {
+    if (!currentUser) return alert('Sign in to save favorites.');
     const favs = getFavorites(currentUser);
-    if (!favs.includes(recipeName)) {
-        favs.push(recipeName);
-        saveFavorites(currentUser, favs);
-        renderFavorites();
-    }
+    const idx = favs.indexOf(recipeName);
+    if (idx === -1) favs.push(recipeName);
+    else favs.splice(idx, 1);
+    saveFavorites(currentUser, favs);
+    renderFavorites();
 }
 
 function renderFavorites() {
-    const favs = getFavorites(currentUser);
-    const list = document.getElementById('favorites-list');
-
-    if (favs.length === 0) {
-        list.innerHTML = '<div class="no-results">No favorites yet.</div>';
+    const container = $id('favorites-list');
+    if (!container) return;
+    if (!currentUser) {
+        container.innerHTML = '<div class="no-results">Sign in to view favorites.</div>';
         return;
     }
-
-    list.innerHTML = favs.map(f => `<div class="favorite-item">${f}</div>`).join('');
+    const favs = getFavorites(currentUser);
+    if (!favs.length) {
+        container.innerHTML = '<div class="no-results">No favorites yet.</div>';
+        return;
+    }
+    container.innerHTML = favs.map(f => `<div class="favorite-item">${escapeHtml(f)}</div>`).join('');
 }
 
 // -----------------
-// COMMENTS
+// Comments (recipe-specific)
 // -----------------
-function openRecipeComments(recipeName) {
+function openCommentModal(recipeName) {
     selectedRecipeForComment = recipeName;
-    commentRecipeName.textContent = recipeName;
-
+    if (commentRecipeName) commentRecipeName.textContent = recipeName;
     const comments = getRecipeComments(recipeName);
-    recipeCommentsList.innerHTML = comments.length
-        ? comments.map(c => `<div class="comment">${c}</div>`).join('')
-        : '<div class="no-results">No comments yet.</div>';
-
-    recipeCommentModal.style.display = 'block';
+    if (recipeCommentsList) {
+        recipeCommentsList.innerHTML = comments.length ? comments.map(c => `<div class="comment">${escapeHtml(c)}</div>`).join('') : '<div class="no-results">No comments yet.</div>';
+    }
+    if (recipeCommentModal) recipeCommentModal.style.display = 'block';
 }
 
-recipeCommentBtn.addEventListener('click', () => {
-    const text = recipeCommentTextarea.value.trim();
+function postRecipeComment() {
+    if (!currentUser) return alert('Sign in to post a comment.');
+    if (!selectedRecipeForComment) return;
+    const text = (recipeCommentTextarea && recipeCommentTextarea.value || '').trim();
     if (!text) return;
-
     const comments = getRecipeComments(selectedRecipeForComment);
-    comments.push(text);
+    comments.push(`${currentUser}: ${text}`);
     saveRecipeComments(selectedRecipeForComment, comments);
-
-    openRecipeComments(selectedRecipeForComment);
-    recipeCommentTextarea.value = '';
-});
-
-recipeCommentModalClose.addEventListener('click', () => {
-    recipeCommentModal.style.display = 'none';
-});
+    openCommentModal(selectedRecipeForComment);
+    if (recipeCommentTextarea) recipeCommentTextarea.value = '';
+}
 
 // -----------------
-// GENERAL COMMENTS
+// General comments
 // -----------------
 function renderGeneralComments() {
+    if (!generalCommentsContainer) return;
     const comments = getGeneralComments();
-
-    generalCommentsContainer.innerHTML = comments.length
-        ? comments.map(c => `<div class="comment">${c}</div>`).join('')
-        : '<div class="no-results">No general comments yet.</div>';
+    generalCommentsContainer.innerHTML = comments.length ? comments.map(c => `<div class="comment">${escapeHtml(c)}</div>`).join('') : '<div class="no-results">No general posts yet.</div>';
+}
+function postGeneralComment() {
+    if (!currentUser) return alert('Sign in to post.');
+    const text = (generalCommentTextarea && generalCommentTextarea.value || '').trim();
+    if (!text) return;
+    const comments = getGeneralComments();
+    comments.push(`${currentUser}: ${text}`);
+    saveGeneralComments(comments);
+    renderGeneralComments();
+    if (generalCommentTextarea) generalCommentTextarea.value = '';
 }
 
-generalCommentBtn.addEventListener('click', () => {
-    const text = generalCommentTextarea.value.trim();
-    if (!text) return;
-
-    const comments = getGeneralComments();
-    comments.push(text);
-    saveGeneralComments(comments);
-
-    renderGeneralComments();
-    generalCommentTextarea.value = '';
-});
-
 // -----------------
-// WEEKLY PLAN
+// Weekly plan
 // -----------------
 function openPlanModal(recipeName) {
+    if (!currentUser) return alert('Sign in to create a meal plan.');
     selectedRecipeForPlan = recipeName;
-    planRecipeName.textContent = recipeName;
-    planModal.style.display = 'block';
+    if (planRecipeName) planRecipeName.textContent = recipeName;
+    if (planModal) planModal.style.display = 'block';
 }
-
-planModalClose.addEventListener('click', () => {
-    planModal.style.display = 'none';
-});
-
-planConfirmBtn.addEventListener('click', () => {
-    const day = planDaySelect.value;
-    const meal = planMealSelect.value;
-
-    if (!day || !meal) return;
-
+function confirmAddToPlan() {
+    if (!currentUser) return alert('Sign in to save a meal plan.');
+    const day = planDaySelect ? planDaySelect.value : null;
+    const meal = planMealSelect ? planMealSelect.value : null;
+    if (!day || !meal || !selectedRecipeForPlan) return alert('Select day, meal and a recipe.');
     const plan = getMealPlan(currentUser);
     plan[day][meal] = selectedRecipeForPlan;
     saveMealPlan(currentUser, plan);
-
     renderWeeklyPlan();
-    planModal.style.display = 'none';
-});
-
-function renderWeeklyPlan() {
-    const plan = getMealPlan(currentUser);
-
-    weeklyPlanContainer.innerHTML = Object.keys(plan).map(day => `
-        <div class="plan-day">
-            <h4>${day}</h4>
-            <p>Breakfast: ${plan[day].breakfast || '-'}</p>
-            <p>Lunch: ${plan[day].lunch || '-'}</p>
-            <p>Dinner: ${plan[day].dinner || '-'}</p>
-        </div>
-    `).join('');
+    if (planModal) planModal.style.display = 'none';
 }
-
-// -----------------
-// On Page Load
-// -----------------
-window.onload = async () => {
-    await loadRecipes();
-
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-        showMainContent(savedUser);
+function renderWeeklyPlan() {
+    if (!weeklyPlanContainer) return;
+    if (!currentUser) {
+        weeklyPlanContainer.innerHTML = '<div class="no-results">Sign in to create a meal plan.</div>';
+        return;
     }
-};
+    const plan = getMealPlan(currentUser);
+    weeklyPlanContainer.innerHTML = Object.
