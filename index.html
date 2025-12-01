@@ -47,9 +47,20 @@
             <!-- TAB CONTENT: SEARCH -->
             <div id="search" class="tab-content">
                 <h2>Find Recipes</h2>
-                <button id="search-btn" class="btn btn-primary">Search All Recipes</button>
-                <div id="results"></div>
-            </div>
+
+        <!-- Ingredients filter box -->
+                <div id="ingredients-container">
+        <!-- Example ingredient boxes -->
+                <div class="ingredient-box">🍅 Tomato</div>
+                <div class="ingredient-box">🥔 Potato</div>
+                <div class="ingredient-box">🥕 Carrot</div>
+        <!-- You can populate dynamically with JS -->
+    </div>
+
+    <button id="search-btn" class="btn btn-primary">Search All Recipes</button>
+    <div id="results"></div>
+</div>
+                
 
             <!-- TAB CONTENT: FAVORITES -->
             <div id="favorites" class="tab-content" style="display:none;">
@@ -119,4 +130,5 @@
     <script src="app.js"></script>
 </body>
 </html>
+
 
