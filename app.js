@@ -587,6 +587,20 @@ searchBtn.addEventListener('click', () => {
 });
 
 // -----------------
+// Auth Button Event Listeners
+// -----------------
+signInBtn.addEventListener('click', signIn);
+signUpBtn.addEventListener('click', signUp);
+signOutBtn.addEventListener('click', signOut);
+
+// Allow Enter key to submit on password field
+passwordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        signIn();
+    }
+});
+
+// -----------------
 // Initialize
 // -----------------
 window.addEventListener('load', async () => {
