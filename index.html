@@ -8,19 +8,22 @@
 </head>
 <body>
     <div class="container">
-        <div id="authDiv" class="auth-section">
-            <h1>🍎 FridgeFinder 🔍</h1>
-            <h2> Sign In or Create Account</h2>
-            <div class="auth-form">
-                <input type="text" id="username" placeholder="Username (e.g., chef_anna)">
-                <input type="password" id="password" placeholder="Password">
-                <div class="auth-buttons">
-                    <button id="signInBtn" class="btn btn-primary">🔑 Sign In</button>
-                    <button id="signUpBtn" class="btn btn-secondary">📝 Create Account</button>
-                </div>
-                <p id="authMessage" class="auth-message"></p>
-            </div>
+       <div id="authDiv" class="auth-section">
+    <h1>🍎 FridgeFinder 🔍</h1>
+    <h2> Sign In or Create Account</h2>
+    
+    <form id="authForm" class="auth-form">
+        <input type="text" id="username" placeholder="Username (e.g., chef_anna)">
+        <input type="password" id="password" placeholder="Password">
+        
+        <div class="auth-buttons">
+            <button type="button" id="signInBtn" class="btn btn-primary">🔑 Sign In</button>
+            <button type="button" id="signUpBtn" class="btn btn-secondary">📝 Create Account</button>
         </div>
+        
+        <p id="authMessage" class="auth-message"></p>
+    </form>
+</div>
 
         <div id="mainContent" style="display:none;">
             <div class="header">
@@ -149,3 +152,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+
