@@ -235,18 +235,38 @@ function getAllIngredients() {
         recipe.ingredients.forEach(ingredient => {
             let normalized = ingredient.toLowerCase().trim();
             
-            // Simple pluralization handling
+            // Improved pluralization handling
             if (normalized.endsWith('s') && normalized.length > 3) {
-                const keepPlural = ['peas', 'beans', 'lentils', 'oats', 'grits', 'olives'];
+                // Keep these words as-is (always plural or proper form)
+                const keepPlural = ['peas', 'beans', 'lentils', 'oats', 'grits', 'olives', 
+                                   'strawberries', 'blueberries', 'raspberries', 'cranberries', 
+                                   'blackberries', 'cherries', 'pears', 'apples', 'grapes',
+                                   'onions', 'potatoes', 'tomatoes', 'carrots', 'peppers',
+                                   'eggs', 'mushrooms', 'noodles', 'chips', 'cookies'];
+                
                 if (!keepPlural.includes(normalized)) {
-                    if (normalized.endsWith('es') && normalized.length > 4) {
-                        const beforeEs = normalized.slice(-3, -2);
-                        if (['o', 'h'].includes(beforeEs) || normalized.endsWith('ies')) {
-                            normalized = normalized.slice(0, -2);
-                        } else {
-                            normalized = normalized.slice(0, -1);
+                    // Handle -ies ending (berries, cherries) -> remove -ies, add -y
+                    if (normalized.endsWith('ies') && normalized.length > 4) {
+                        const base = normalized.slice(0, -3);
+                        // Don't singularize if it ends in a vowel before 'ies'
+                        if (!'aeiou'.includes(base[base.length - 1])) {
+                            normalized = base + 'y';
                         }
-                    } else {
+                    }
+                    // Handle -oes ending (tomatoes, potatoes) -> remove -es
+                    else if (normalized.endsWith('oes') && normalized.length > 4) {
+                        normalized = normalized.slice(0, -2);
+                    }
+                    // Handle -shes, -ches ending -> remove -es
+                    else if ((normalized.endsWith('shes') || normalized.endsWith('ches')) && normalized.length > 5) {
+                        normalized = normalized.slice(0, -2);
+                    }
+                    // Handle -sses ending (glasses) -> remove -es
+                    else if (normalized.endsWith('sses') && normalized.length > 5) {
+                        normalized = normalized.slice(0, -2);
+                    }
+                    // Default: just remove the 's'
+                    else if (!normalized.endsWith('ss') && !normalized.endsWith('us')) {
                         normalized = normalized.slice(0, -1);
                     }
                 }
