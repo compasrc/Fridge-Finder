@@ -32,6 +32,10 @@ const planRecipeName = document.getElementById('plan-recipe-name');
 const planDaySelect = document.getElementById('plan-day-select');
 const planMealSelect = document.getElementById('plan-meal-select');
 const planConfirmBtn = document.getElementById('plan-confirm-btn');
+const newPlanBtn = document.getElementById('new-plan-btn');
+const savePlanBtn = document.getElementById('save-plan-btn');
+const loadPlanSelect = document.getElementById('load-plan-select');
+const suggestionsList = document.getElementById('suggestions-list');
 
 // Recipe Comments Modal elements
 const recipeCommentModal = document.getElementById('recipe-comment-modal');
@@ -95,6 +99,34 @@ function getMealPlan(username) {
 
 function saveMealPlan(username, plan) { localStorage.setItem(`mealPlan_${username}`, JSON.stringify(plan)); }
 
+function getSavedPlans(username) {
+    const key = `savedPlans_${username}`;
+    return JSON.parse(localStorage.getItem(key) || '{}');
+}
+
+function saveNamedPlan(username, planName, plan) {
+    const savedPlans = getSavedPlans(username);
+    savedPlans[planName] = plan;
+    localStorage.setItem(`savedPlans_${username}`, JSON.stringify(savedPlans));
+}
+
+function loadNamedPlan(username, planName) {
+    const savedPlans = getSavedPlans(username);
+    return savedPlans[planName] || null;
+}
+
+function updateLoadPlanDropdown() {
+    if (!currentUser) return;
+    const savedPlans = getSavedPlans(currentUser);
+    loadPlanSelect.innerHTML = '<option disabled selected>-- Load Saved Plan --</option>';
+    Object.keys(savedPlans).forEach(planName => {
+        const option = document.createElement('option');
+        option.value = planName;
+        option.textContent = planName;
+        loadPlanSelect.appendChild(option);
+    });
+}
+
 // -----------------
 // Authentication Logic
 // -----------------
@@ -151,6 +183,7 @@ function showMainContent(username) {
     renderFavorites();
     renderGeneralComments();
     renderWeeklyPlan();
+    updateLoadPlanDropdown();
 
     switchTab('search');
 }
@@ -567,6 +600,96 @@ planConfirmBtn.addEventListener('click', () => {
     selectedRecipeForPlan = null;
     renderWeeklyPlan();
 });
+
+// -----------------
+// New Plan / Save Plan / Load Plan
+// -----------------
+newPlanBtn.addEventListener('click', () => {
+    if (!confirm('Create a new empty plan? This will clear your current plan.')) return;
+    const emptyPlan = { Sunday: {}, Monday: {}, Tuesday: {}, Wednesday: {}, Thursday: {}, Friday: {}, Saturday: {} };
+    ['breakfast','lunch','dinner'].forEach(meal => {
+        Object.keys(emptyPlan).forEach(day => emptyPlan[day][meal] = null);
+    });
+    saveMealPlan(currentUser, emptyPlan);
+    renderWeeklyPlan();
+    alert('New empty plan created!');
+});
+
+savePlanBtn.addEventListener('click', () => {
+    const planName = prompt('Enter a name for this meal plan:');
+    if (!planName || !planName.trim()) return alert('Plan name cannot be empty.');
+    const currentPlan = getMealPlan(currentUser);
+    saveNamedPlan(currentUser, planName.trim(), currentPlan);
+    updateLoadPlanDropdown();
+    alert(`Plan "${planName}" saved successfully!`);
+});
+
+loadPlanSelect.addEventListener('change', () => {
+    const planName = loadPlanSelect.value;
+    if (!planName) return;
+    const plan = loadNamedPlan(currentUser, planName);
+    if (plan) {
+        saveMealPlan(currentUser, plan);
+        renderWeeklyPlan();
+        alert(`Plan "${planName}" loaded!`);
+    }
+    loadPlanSelect.selectedIndex = 0;
+});
+
+// -----------------
+// Suggestions Panel Logic
+// -----------------
+document.querySelectorAll('.suggestion-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const mealType = btn.getAttribute('data-meal');
+        showMealSuggestions(mealType);
+    });
+});
+
+function showMealSuggestions(mealType) {
+    // Get recipes appropriate for the meal type from our loaded recipes
+    let suggestions = [];
+    
+    if (allRecipes.length > 0) {
+        // Use actual recipe names from TheMealDB
+        suggestions = allRecipes.slice(0, 8).map(r => r.name);
+    } else {
+        // Fallback suggestions if recipes haven't loaded yet
+        const exampleSuggestions = {
+            breakfast: ['Pancakes', 'Oatmeal', 'Smoothie Bowl', 'French Toast', 'Breakfast Burrito'],
+            lunch: ['Chicken Salad', 'Veggie Wrap', 'Grilled Cheese', 'Caesar Salad', 'Turkey Sandwich'],
+            dinner: ['Spaghetti Bolognese', 'Grilled Salmon', 'Stir Fry Vegetables', 'Roast Chicken', 'Beef Tacos']
+        };
+        suggestions = exampleSuggestions[mealType] || [];
+    }
+
+    suggestionsList.innerHTML = '';
+
+    suggestions.forEach(recipeName => {
+        const li = document.createElement('li');
+        li.style.cursor = 'pointer';
+        li.style.margin = '5px 0';
+        li.style.padding = '5px';
+        li.style.borderRadius = '4px';
+        li.style.transition = 'background-color 0.2s';
+        li.textContent = recipeName;
+        
+        li.addEventListener('mouseenter', () => {
+            li.style.backgroundColor = 'rgba(0,0,0,0.1)';
+        });
+        li.addEventListener('mouseleave', () => {
+            li.style.backgroundColor = 'transparent';
+        });
+        
+        li.addEventListener('click', () => {
+            selectedRecipeForPlan = { name: recipeName };
+            planRecipeName.textContent = recipeName;
+            planMealSelect.value = mealType;
+            planModal.style.display = 'flex';
+        });
+        suggestionsList.appendChild(li);
+    });
+}
 
 // -----------------
 // Search Button Action
