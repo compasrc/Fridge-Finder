@@ -333,9 +333,45 @@ function findRecipes(userIngredients, selectedAllergens) {
 }
 
 function allergensMatch(recipeIngredients, allergen) {
-    if (allergen === 'gluten') return recipeIngredients.some(i => i.includes('bread') || i.includes('pasta') || i.includes('naan') || i.includes('flour'));
-    if (allergen === 'nuts') return recipeIngredients.some(i => i.includes('nuts') || i.includes('peanut') || i.includes('almond') || i.includes('pecan'));
-    if (allergen === 'dairy') return recipeIngredients.some(i => i.includes('cheese') || i.includes('milk') || i.includes('butter') || i.includes('cream'));
+    const ingredientsLower = recipeIngredients.map(i => i.toLowerCase());
+    
+    if (allergen === 'gluten') {
+        const glutenItems = [
+            'bread', 'pasta', 'naan', 'flour', 'wheat', 'barley', 'rye', 
+            'couscous', 'semolina', 'farina', 'spelt', 'bulgur', 'malt',
+            'noodles', 'crackers', 'baguette', 'tortilla', 'pita', 'croissant',
+            'breadcrumbs', 'spaghetti', 'macaroni', 'lasagna', 'linguine',
+            'fettuccine', 'penne', 'orzo', 'cereal', 'biscuit', 'scone'
+        ];
+        return ingredientsLower.some(ingredient => 
+            glutenItems.some(item => ingredient.includes(item))
+        );
+    }
+    
+    if (allergen === 'nuts') {
+        const nutItems = [
+            'nut', 'peanut', 'almond', 'pecan', 'walnut', 'cashew',
+            'pistachio', 'hazelnut', 'macadamia', 'brazil nut', 'pine nut',
+            'chestnut', 'nutmeg', 'peanut butter', 'almond milk'
+        ];
+        return ingredientsLower.some(ingredient => 
+            nutItems.some(item => ingredient.includes(item))
+        );
+    }
+    
+    if (allergen === 'dairy') {
+        const dairyItems = [
+            'cheese', 'milk', 'butter', 'cream', 'yogurt', 'yoghurt',
+            'cheddar', 'mozzarella', 'parmesan', 'feta', 'brie', 'gouda',
+            'ricotta', 'cottage cheese', 'sour cream', 'whipped cream',
+            'ice cream', 'custard', 'buttermilk', 'ghee', 'paneer',
+            'mascarpone', 'goat cheese', 'blue cheese', 'cream cheese'
+        ];
+        return ingredientsLower.some(ingredient => 
+            dairyItems.some(item => ingredient.includes(item))
+        );
+    }
+    
     return false;
 }
 
