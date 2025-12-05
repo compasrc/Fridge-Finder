@@ -1,1 +1,2 @@
-# A recipe finder tool
+# A recipe Finder Tool
+Fridge Finder is a simple, community-driven recipe app that helps users turn the ingredients they already have into meals. By pulling real recipes from an external API, the app offers accurate, diverse options while encouraging users to share ideas, reduce waste, and cook together as a community.
